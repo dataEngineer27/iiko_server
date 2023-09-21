@@ -4,7 +4,7 @@ import requests
 import crud
 import micro
 
-key = '2f9cf7b9-db89-0628-2715-734e5ae4fbcd'#micro.authiiko()
+key = micro.authiiko()
 departments = micro.list_departments(key=key)
 dict_department = crud.add_departments(db=session,lst=departments)
 
