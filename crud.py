@@ -199,10 +199,13 @@ def add_withdraw_shifts(db:Session,lst):
                                          status = i['status']
                                          )
         db.add(query)
+        print(f"added {i['info']['id']}")
         try:
             db.commit()
+
         except IntegrityError as e:
-            db.rollback()  # Rollback the transaction
+            db.rollback()
+            print(f"cannot {i['info']['id']}")  # Rollback the transaction
     return True
 
 
@@ -216,10 +219,13 @@ def add_department_ravenue(db:Session,lst,department):
         sum = sum.text  if sum is not None else None
         query = models.DepartmentRavenue(date=date,product_id=product_id,department_id=department,sum=sum)
         db.add(query)
+        print(f"added {product_id}")
         try:
             db.commit()
+
         except IntegrityError as e:
-            db.rollback()  # Rollback the transaction
+            db.rollback()
+            print(f"cannot {product_id}")  # Rollback the transaction
 
     return True
 

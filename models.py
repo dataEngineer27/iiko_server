@@ -19,7 +19,7 @@ class Categories(Base):
     name=Column(String)
     groups = relationship('Groups',back_populates='category')
     last_update = Column(DateTime(timezone=True),default=func.now())
-
+    user_tool = relationship('Tools',back_populates='user_category')
 
 
 class Groups(Base):
@@ -50,7 +50,8 @@ class Tools(Base):
     product_type = Column(String,nullable=True)
     cooking_place_type = Column(String,nullable=True)
     main_unit = Column(String,nullable=True)
-    category_id = Column(String,nullable=True)
+    category_id = Column(UUID(as_uuid=True),ForeignKey('user_categories.id'),nullable=True)
+    user_category = relationship('Categories',back_populates='user_tool')
     last_update = Column(DateTime(timezone=True),default=func.now())
 
 
@@ -146,6 +147,7 @@ class Shift_list(Base):
     point_of_sale_id = Column(UUID(as_uuid=True),nullable=True)
     last_add = Column(DateTime(timezone=True),default=func.now())
     shiftlst = relationship('ShiftPaymentWithd',back_populates='shift_pay')
+
 
 
 
