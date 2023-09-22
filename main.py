@@ -36,21 +36,21 @@ key = micro.authiiko()
 
 #big childs so comment before
 
-#shift_id_list = crud.get_all_payment_shifts(db=session)
-#for i in shift_id_list:
-#    try:
-#        get_withdraw_shifts = micro.get_shift_withdraw(key=key,session_id=i.id)
-#        add_withdraw_shifts = crud.add_withdraw_shifts(db=session,lst=get_withdraw_shifts)
-#    except:
-#        key = micro.authiiko()
-
-departments= crud.get_all_department(db=session)
-for i in departments:
+shift_id_list = crud.get_all_payment_shifts(db=session)
+for i in shift_id_list:
     try:
-        get_department_ravenue = micro.get_department_ravenue(key=key,department=i.id)
-        add_department_ravenue = crud.add_department_ravenue(db=session,lst=get_department_ravenue,department=i.id)
+        get_withdraw_shifts = micro.get_shift_withdraw(key=key,session_id=i.id)
+        add_withdraw_shifts = crud.add_withdraw_shifts(db=session,lst=get_withdraw_shifts)
     except:
         key = micro.authiiko()
+
+#departments= crud.get_all_department(db=session)
+#for i in departments:
+#    try:
+#        get_department_ravenue = micro.get_department_ravenue(key=key,department=i.id)
+#        add_department_ravenue = crud.add_department_ravenue(db=session,lst=get_department_ravenue,department=i.id)
+#    except:
+#        key = micro.authiiko()
 
 
 
