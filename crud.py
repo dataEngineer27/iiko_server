@@ -241,3 +241,22 @@ def get_all_department(db:Session):
 def get_all_payment_shifts(db:Session):
     query = db.query(models.Shift_list).all()
     return query
+
+
+
+
+def update_department_renenue(db:Session,id):
+    query  = db.query(models.Departments).filter(models.Departments.id==id).first()
+    if query:
+        query.is_added==1
+        db.commit()
+    return True
+
+
+
+def update_shift_ids(db:Session,id):
+    query  = db.query(models.Shift_list).filter(models.Shift_list.id==id).first()
+    if query:
+        query.is_added==1
+        db.commit()
+    return True

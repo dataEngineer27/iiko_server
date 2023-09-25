@@ -66,6 +66,7 @@ class Departments(Base):
     last_update = Column(DateTime(timezone=True),default=func.now())
     employee_depart = relationship('Employees',back_populates='department')
     department_shift = relationship('ShiftPaymentWithd',back_populates='shift_pay_dep')
+    is_added = Column(Integer,default=0)
 
 
 
@@ -147,6 +148,7 @@ class Shift_list(Base):
     point_of_sale_id = Column(UUID(as_uuid=True),nullable=True)
     last_add = Column(DateTime(timezone=True),default=func.now())
     shiftlst = relationship('ShiftPaymentWithd',back_populates='shift_pay')
+    is_added = Column(Integer,default=0)
 
 
 
