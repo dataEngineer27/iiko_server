@@ -57,7 +57,7 @@ class Groups(Base):
 #     product_expense = relationship('ProductExpense', back_populates='products')
 
 
-class Tools(Base):
+class Nomenclatures(Base):
     __tablename__ = 'nomenclatures'
     id = Column(UUID(as_uuid=True), primary_key=True)
     group_id = Column(UUID(as_uuid=True), ForeignKey('nomenclature_groups.id'))
@@ -93,7 +93,7 @@ class Departments(Base):
     product_expense = relationship('ProductExpense', back_populates='department')
 
 
-class DepartmentRavenue(Base):
+class DepartmentRevenue(Base):
     __tablename__ = 'department_revenue'
     id = Column(Integer, primary_key=True, index=True)
     department_id = Column(UUID(as_uuid=True), nullable=True)
@@ -134,7 +134,7 @@ class Employees(Base):
     shift_list_employee = relationship('Shift_list', back_populates='shift_employee')
 
 
-class Shift_list(Base):
+class ShiftList(Base):
     __tablename__ = 'shift_list'
     id = Column(UUID(as_uuid=True), primary_key=True)
     session_number = Column(Integer, nullable=True)
@@ -149,7 +149,7 @@ class Shift_list(Base):
     responsible_user_id = Column(UUID(as_uuid=True), nullable=True)
     session_start_cash = Column(REAL, nullable=True)
     pay_orders = Column(BIGINT, nullable=True)
-    sum_writeoff_orders  = Column(BIGINT, nullable=True)
+    sum_writeoff_orders = Column(BIGINT, nullable=True)
     sales_cash = Column(REAL, nullable=True)
     sales_credit = Column(REAL, nullable=True)
     sales_card = Column(REAL, nullable=True)
@@ -166,7 +166,7 @@ class Shift_list(Base):
     is_added = Column(Integer, default=0)
 
 
-class ShiftPaymentWithd(Base):
+class ShiftPayments(Base):
     __tablename__ = 'shift_payments_deposits'
     id = Column(UUID(as_uuid=True), primary_key=True)
     shift_id = Column(UUID(as_uuid=True), ForeignKey('shift_list.id'), nullable=True)
