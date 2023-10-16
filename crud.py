@@ -226,11 +226,39 @@ def add_department_ravenue(db:Session,lst,department):
     return True
 
 
+def add_product_expense(db: Session, product_expense_list, department, product_details):
+    for i in product_expense_list:
+        product_id = i.find('productId')
+        product_id = product_id.text if product_id is not None else None
+        group_id = product_details.group_id
+        category_id = product_details.category_id
+        department_id = department
+        date = i.find('date')
+        date = date.text if date is not None else None
+        name = i.find('productName')
+        name = name.text if name is not None else None
+        quantity = i.find('value')
+        quantity = quantity.text if quantity is not None else None
+        main_unit = product_details.main_unit
+        query = models.ProductExpense(product_id=product_id,
+                                      category_id=category_id,
+                                      group_id=group_id,
+                                      department_id=department_id,
+                                      date=date,
+                                      name=name,
+                                      quantity=quantity,
+                                      main_unit=main_unit)
+        db.add(query)
+        try:
+            db.commit()
+        except IntegrityError as e:
+            db.rollback()
+    return True
 
 
-
-
-
+def get_product(db: Session, id):
+    query = db.query(models.Tools).get(id)
+    return query
 
 
 def get_all_department(db:Session):
@@ -241,7 +269,6 @@ def get_all_department(db:Session):
 def get_all_payment_shifts(db:Session):
     query = db.query(models.Shift_list).all()
     return query
-
 
 
 

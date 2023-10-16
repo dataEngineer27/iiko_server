@@ -1,11 +1,12 @@
-from database import engine,session
+from database import engine, session
 import requests
 
 import crud
 import micro
 
 key = micro.authiiko()
-#departments = micro.list_departments(key=key)
+
+# departments = micro.list_departments(key=key)
 #dict_department = crud.add_departments(db=session,lst=departments)
 #
 #categories = micro.list_categories(key=key)
@@ -39,25 +40,24 @@ key = micro.authiiko()
 shift_id_list = crud.get_all_payment_shifts(db=session)
 for i in shift_id_list:
     if i.is_added==0:
-        crud.update_shift_ids(db=session,id=i.id)
         try:
             get_withdraw_shifts = micro.get_shift_withdraw(key=key,session_id=i.id)
             add_withdraw_shifts = crud.add_withdraw_shifts(db=session,lst=get_withdraw_shifts)
         except:
             key = micro.authiiko()
+            get_withdraw_shifts = micro.get_shift_withdraw(key=key, session_id=i.id)
+            add_withdraw_shifts = crud.add_withdraw_shifts(db=session, lst=get_withdraw_shifts)
+        crud.update_shift_ids(db=session, id=i.id)
 
-#departments= crud.get_all_department(db=session)
-#for i in departments:
+# departments = crud.get_all_department(db=session)
+# for i in departments:
 #    if i.is_added ==0:
-#        crud.update_department_renenue(db=session,id=i.id)
 #        try:
 #            get_department_ravenue = micro.get_department_ravenue(key=key,department=i.id)
 #            add_department_ravenue = crud.add_department_ravenue(db=session,lst=get_department_ravenue,department=i.id)
 #        except:
 #            key = micro.authiiko()
-
-
-
-
-
+#            get_department_ravenue = micro.get_department_ravenue(key=key, department=i.id)
+#            add_department_ravenue = crud.add_department_ravenue(db=session, lst=get_department_ravenue, department=i.id)
+#        crud.update_department_renenue(db=session, id=i.id)
 
