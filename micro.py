@@ -4,73 +4,77 @@ from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
 
 load_dotenv()
-PASSWORD_IIKO = os.environ.get('PASSWORD_IIKO')
-LOGIN_IIKO = os.environ.get('LOGIN_IIKO')
+PASSWORD = os.environ.get('PASSWORD')
+LOGIN = os.environ.get('LOGIN')
 BASE_URL = os.environ.get('BASE_URL')
 
 
 def authiiko():
-    data = requests.get(f"{BASE_URL}/resto/api/auth?login={LOGIN_IIKO}&pass={PASSWORD_IIKO}")
+    data = requests.get(f"{BASE_URL}/resto/api/auth?login={LOGIN}&pass={PASSWORD}")
     key = data.text
     return key
 
 
-def list_departments(key):
+def department_list(key):
     departments = requests.get(f"{BASE_URL}/resto/api/corporation/departments?key={key}")
     root = ET.fromstring(departments.content)
     corporate_item_dtos = root.findall('corporateItemDto')
     return corporate_item_dtos
 
 
-def list_categories(key):
+def category_list(key):
     categories = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/category/list?key={key}")
     return categories.json()
 
 
-def get_nomenclature_gr(key):
+def nomenclature_groups(key):
     groups = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/group/list?key={key}")
     return groups.json()
 
 
-def get_tools(key):
-    tools = requests.get(f"{BASE_URL}/resto/api/products?key={key}")
-    root = ET.fromstring(tools.content)
-    product_item_dtos = root.findall('productDto')
-    return product_item_dtos
+# def nomenclature_list(key):
+#     tools = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/list?includeDeleted=true&key={key}")
+#     root = ET.fromstring(tools.content)
+#     product_item_dtos = root.findall('productDto')
+#     return product_item_dtos
+
+def nomenclature_list(key):
+    nomenclatures = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/list?includeDeleted=true&key={key}")
+    return nomenclatures.json()
 
 
-def get_employee_roles(key):
+def employee_roles(key):
     roles = requests.get(f"{BASE_URL}/resto/api/employees/roles?key={key}")
     root = ET.fromstring(roles.content)
     corporate_item_dtos = root.findall('role')
     return corporate_item_dtos
 
 
-def get_employees(key):
+def employee_list(key):
     employees = requests.get(f"{BASE_URL}/resto/api/employees?key={key}")
     root = ET.fromstring(employees.content)
     corporate_item_dtos = root.findall('employee')
     return corporate_item_dtos
 
 
-def get_employee_shifts(key):
+def shift_list(key):
     employee_shift = requests.get(f"{BASE_URL}/resto/api/v2/cashshifts/list?openDateFrom=2023-01-01&openDateTo=2023-09-20&status=ANY&key={key}")
     return employee_shift.json()
 
 
-def get_shift_withdraw(key,session_id):
+def shift_payments(key, session_id):
     withdraw_shift = requests.get(f"{BASE_URL}/resto/api/v2/cashshifts/payments/list/{session_id}?hideAccepted=false&key={key}")
     return withdraw_shift.json()
 
 
-def get_department_ravenue(key,department):
+def department_revenue(key, department):
     department_data = requests.get(f"{BASE_URL}/resto/api/reports/sales?key={key}&department={department}&dateFrom=01.01.2023&dateTo=21.09.2023&dishDetails=true&allRevenue=true")
     root = ET.fromstring(department_data.content)
     corporate_item_dtos = root.findall('dayDishValue')
     return corporate_item_dtos
 
 
-def get_product_expense(key, department):
+def product_expenses(key, department):
     response = requests.get(f"{BASE_URL}/resto/api/reports/productExpense?key={key}&department={department}&dateFrom=01.01.2023&dateTo=21.09.2023")
     root = ET.fromstring(response.content)
     expense_data = root.findall("dayDishValue")

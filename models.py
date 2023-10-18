@@ -13,14 +13,14 @@ Base = declarative_base()
 
 
 class Categories(Base):
-    __tablename__ = 'user_categories'
+    __tablename__ = 'nomenclature_categories'
     id = Column(UUID(as_uuid=True), primary_key=True)
     deleted = Column(Boolean)
     name = Column(String)
-    groups = relationship('Groups', back_populates='category')
     last_update = Column(DateTime(timezone=True), default=func.now())
-    user_tool = relationship('Tools', back_populates='user_category')
-    product_expense = relationship('ProductExpense', back_populates='user_category')
+    groups = relationship('Groups', back_populates='category')
+    nomenclatures = relationship('Nomenclatures', back_populates='category')
+    product_expense = relationship('ProductExpense', back_populates='category')
 
 
 class Groups(Base):
@@ -31,12 +31,12 @@ class Groups(Base):
     name = Column(String, nullable=True)
     num = Column(String, nullable=True)
     code = Column(String, nullable=True)
-    category_id = Column(UUID(as_uuid=True), ForeignKey('user_categories.id'), nullable=True)
-    category = relationship('Categories', back_populates='groups')
+    category_id = Column(UUID(as_uuid=True), ForeignKey('nomenclature_categories.id'), nullable=True)
     accountingCategory_id = Column(UUID(as_uuid=True), nullable=True)
-    tools = relationship('Tools', back_populates='groups')
     departments_visibility = Column(ARRAY(UUID(as_uuid=True)), nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
+    category = relationship('Categories', back_populates='groups')
+    nomenclatures = relationship('Nomenclatures', back_populates='groups')
     product_expense = relationship('ProductExpense', back_populates='groups')
 
 
@@ -60,10 +60,8 @@ class Groups(Base):
 class Nomenclatures(Base):
     __tablename__ = 'nomenclatures'
     id = Column(UUID(as_uuid=True), primary_key=True)
-    group_id = Column(UUID(as_uuid=True), ForeignKey('nomenclature_groups.id'))
-    groups = relationship('Groups', back_populates='tools')
-    category_id = Column(UUID(as_uuid=True), ForeignKey('user_categories.id'), nullable=True)
-    user_category = relationship('Categories', back_populates='user_tool')
+    group_id = Column(UUID(as_uuid=True), ForeignKey('nomenclature_groups.id'), nullable=True)
+    category_id = Column(UUID(as_uuid=True), ForeignKey('nomenclature_categories.id'), nullable=True)
     accounting_category = Column(UUID(as_uuid=True))
     name = Column(String)
     num = Column(String, nullable=True)
@@ -75,6 +73,9 @@ class Nomenclatures(Base):
     type = Column(String, nullable=True)
     unit_weight = Column(Float, nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
+    category = relationship('Categories', back_populates='nomenclatures')
+    groups = relationship('Groups', back_populates='nomenclatures')
+    department_revenue = relationship('DepartmentRevenue', back_populates='nomenclatures')
     product_expense = relationship('ProductExpense', back_populates='nomenclatures')
 
 
@@ -86,21 +87,25 @@ class Departments(Base):
     name = Column(String, nullable=True)
     type = Column(String, nullable=True)
     tax_payer_id = Column(String, nullable=True)
+    is_added = Column(Integer, default=0)
     last_update = Column(DateTime(timezone=True), default=func.now())
-    employee_depart = relationship('Employees', back_populates='department')
-    department_shift = relationship('ShiftPaymentWithd', back_populates='shift_pay_dep')
-    is_added = Column(Integer,default=0)
+    employee = relationship('Employees', back_populates='department')
+    shifts = relationship('ShiftList', back_populates='department')
+    payments = relationship('ShiftPayments', back_populates='department')
+    department_revenue = relationship('DepartmentRevenue', back_populates='department')
     product_expense = relationship('ProductExpense', back_populates='department')
 
 
 class DepartmentRevenue(Base):
     __tablename__ = 'department_revenue'
     id = Column(Integer, primary_key=True, index=True)
-    department_id = Column(UUID(as_uuid=True), nullable=True)
-    product_id = Column(UUID(as_uuid=True), nullable=True)
+    department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
+    nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
     date = Column(String, nullable=True)
     sum = Column(REAL, nullable=True)
-    last_add = Column(DateTime(timezone=True), default=func.now())
+    last_update = Column(DateTime(timezone=True), default=func.now())
+    department = relationship('Departments', back_populates='department_revenue')
+    nomenclatures = relationship('Nomenclatures', back_populates='department_revenue')
 
 
 class EmployeeRoles(Base):
@@ -110,7 +115,7 @@ class EmployeeRoles(Base):
     name = Column(String)
     deleted = Column(Boolean)
     last_update = Column(DateTime(timezone=True), default=func.now())
-    employee = relationship('Employees', back_populates='employeerole')
+    employee = relationship('Employees', back_populates='employee_role')
 
 
 class Employees(Base):
@@ -119,19 +124,20 @@ class Employees(Base):
     code = Column(String, nullable=True)
     name = Column(String)
     role_id = Column(UUID(as_uuid=True), ForeignKey('employee_roles.id'), nullable=True)
-    employeerole = relationship('EmployeeRoles', back_populates='employee')
     roles = Column(ARRAY(UUID(as_uuid=True)))
     role_codes = Column(String, nullable=True)
     role_code = Column(String, nullable=True)
     department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'))
-    department = relationship('Departments', back_populates='employee_depart')
     deleted = Column(Boolean, nullable=True)
     supplier = Column(Boolean, nullable=True)
     employee = Column(Boolean, nullable=True)
     client = Column(Boolean, nullable=True)
     representStore = Column(Boolean, nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
-    shift_list_employee = relationship('Shift_list', back_populates='shift_employee')
+    shifts = relationship('ShiftList', back_populates='employee')
+    employee_role = relationship('EmployeeRoles', back_populates='employee')
+    department = relationship('Departments', back_populates='employee')
+    payments = relationship('ShiftPayments', back_populates='employee')
 
 
 class ShiftList(Base):
@@ -145,11 +151,10 @@ class ShiftList(Base):
     close_date = Column(DateTime)
     accepted_date = Column(DateTime)
     manager_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
-    shift_employee = relationship('Employees', back_populates='shift_list_employee')
     responsible_user_id = Column(UUID(as_uuid=True), nullable=True)
     session_start_cash = Column(REAL, nullable=True)
     pay_orders = Column(BIGINT, nullable=True)
-    sum_writeoff_orders = Column(BIGINT, nullable=True)
+    sum_write_off_orders = Column(BIGINT, nullable=True)
     sales_cash = Column(REAL, nullable=True)
     sales_credit = Column(REAL, nullable=True)
     sales_card = Column(REAL, nullable=True)
@@ -161,16 +166,18 @@ class ShiftList(Base):
     session_status = Column(String, nullable=True)
     conception_id = Column(UUID(as_uuid=True), nullable=True)
     point_of_sale_id = Column(UUID(as_uuid=True), nullable=True)
-    last_add = Column(DateTime(timezone=True), default=func.now())
-    shiftlst = relationship('ShiftPaymentWithd', back_populates='shift_pay')
+    department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
+    last_update = Column(DateTime(timezone=True), default=func.now())
     is_added = Column(Integer, default=0)
+    department = relationship('Departments', back_populates='shifts')
+    employee = relationship('Employees', back_populates='shifts')
+    payments = relationship('ShiftPayments', back_populates='shifts')
 
 
 class ShiftPayments(Base):
-    __tablename__ = 'shift_payments_deposits'
+    __tablename__ = 'shift_payments'
     id = Column(UUID(as_uuid=True), primary_key=True)
     shift_id = Column(UUID(as_uuid=True), ForeignKey('shift_list.id'), nullable=True)
-    shift_pay = relationship('Shift_list', back_populates='shiftlst')
     date = Column(DateTime, nullable=True)
     group = Column(String, nullable=True)
     account_id = Column(UUID(as_uuid=True), nullable=True)
@@ -180,30 +187,32 @@ class ShiftPayments(Base):
     sum = Column(Float, nullable=True)
     user_id = Column(UUID(as_uuid=True), nullable=True)
     cause_event_id = Column(UUID(as_uuid=True), nullable=True)
-    cashier_id = Column(UUID(as_uuid=True), nullable=True)
+    cashier_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
     department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
-    shift_pay_dep = relationship('Departments', back_populates='department_shift')
     actual_sum = Column(Float, nullable=True)
     original_sum = Column(Float, nullable=True)
     edited_payaccount_id = Column(UUID(as_uuid=True), nullable=True)
     original_payaccount_id = Column(UUID(as_uuid=True), nullable=True)
     status = Column(String, nullable=True)
-    last_add = Column(DateTime(timezone=True), default=func.now())
+    last_update = Column(DateTime(timezone=True), default=func.now())
+    shifts = relationship('ShiftList', back_populates='payments')
+    employee = relationship('Employees', back_populates='payments')
+    department = relationship('Departments', back_populates='payments')
 
 
 class ProductExpense(Base):
     __tablename__ = 'product_expense'
     id = Column(BIGINT, autoincrement=True, primary_key=True)
-    product_id = Column(UUID(as_uuid=True), ForeignKey('products.id'), nullable=True)
-    nomenclatures = relationship('Tools', back_populates='product_expense')
-    category_id = Column(UUID(as_uuid=True), ForeignKey('user_categories.id'), nullable=True)
-    user_category = relationship('Categories', back_populates='product_expense')
+    nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
+    category_id = Column(UUID(as_uuid=True), ForeignKey('nomenclature_categories.id'), nullable=True)
     group_id = Column(UUID(as_uuid=True), ForeignKey('nomenclature_groups.id'), nullable=True)
-    groups = relationship('Groups', back_populates='product_expense')
     department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
-    department = relationship('Departments', back_populates='product_expense')
     date = Column(DateTime(timezone=True))
     name = Column(String)
     quantity = Column(Float, nullable=True)
     main_unit = Column(String, nullable=True)
-    last_update = Column(DateTime(timezone=True),default=func.now())
+    last_update = Column(DateTime(timezone=True), default=func.now())
+    category = relationship('Categories', back_populates='product_expense')
+    groups = relationship('Groups', back_populates='product_expense')
+    nomenclatures = relationship('Nomenclatures', back_populates='product_expense')
+    department = relationship('Departments', back_populates='product_expense')
