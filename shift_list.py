@@ -1,7 +1,6 @@
-from apps import departments, payments
-from database import session
-import micro
-import crud
+import payments
+from helpers.database import session
+from helpers import crud, micro
 
 
 def app():

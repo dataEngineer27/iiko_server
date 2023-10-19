@@ -1,7 +1,6 @@
-from apps import departments
-from database import session
-import micro
-import crud
+import departments
+from helpers.database import session
+from helpers import crud, micro
 
 
 def app():

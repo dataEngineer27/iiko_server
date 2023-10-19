@@ -1,6 +1,5 @@
-from database import session
-import micro
-import crud
+from helpers.database import session
+from helpers import crud, micro
 
 
 def app():
@@ -16,4 +15,5 @@ def app():
 
 
 if __name__ == '__main__':
+    # app()
     dict_department = app()

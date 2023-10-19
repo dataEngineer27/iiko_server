@@ -1,7 +1,5 @@
 from sqlalchemy.orm import Session
 import models
-import pytz
-from typing import Optional
 from sqlalchemy.exc import IntegrityError
 
 
@@ -40,6 +38,7 @@ def add_categories(db: Session, category_list):
                                   name=category['name'])
         db.add(query)
         db.commit()
+        print("Was added category: ", category['name'])
         # category_dict[category['name']] = category['id']
     # return category_dict
 
