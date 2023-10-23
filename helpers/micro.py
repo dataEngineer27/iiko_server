@@ -9,10 +9,15 @@ LOGIN = os.environ.get('LOGIN')
 BASE_URL = os.environ.get('BASE_URL')
 
 
-def authiiko():
+def login():
     data = requests.get(f"{BASE_URL}/resto/api/auth?login={LOGIN}&pass={PASSWORD}")
     key = data.text
     return key
+
+
+def logout(key):
+    data = requests.get(f"{BASE_URL}/resto/api/logout?key={key}")
+    print(data.text)
 
 
 def department_list(key):
@@ -50,15 +55,15 @@ def employee_roles(key):
     return corporate_item_dtos
 
 
-def employee_list(key):
-    employees = requests.get(f"{BASE_URL}/resto/api/employees?key={key}")
+def employee_list(key, department_code):
+    employees = requests.get(f"{BASE_URL}/resto/api/employees?byDepartment/{department_code}&key={key}")
     root = ET.fromstring(employees.content)
     corporate_item_dtos = root.findall('employee')
     return corporate_item_dtos
 
 
-def shift_list(key):
-    employee_shift = requests.get(f"{BASE_URL}/resto/api/v2/cashshifts/list?openDateFrom=2023-01-01&openDateTo=2023-09-20&status=ANY&key={key}")
+def shift_list(key, department_id):
+    employee_shift = requests.get(f"{BASE_URL}/resto/api/v2/cashshifts/list?openDateFrom=2023-01-01&openDateTo=2023-09-20&departmentId={department_id}&status=ANY&key={key}")
     return employee_shift.json()
 
 
@@ -75,7 +80,7 @@ def department_revenue(key, department):
 
 
 def product_expenses(key, department):
-    response = requests.get(f"{BASE_URL}/resto/api/reports/productExpense?key={key}&department={department}&dateFrom=01.01.2023&dateTo=21.09.2023")
+    response = requests.get(f"{BASE_URL}/resto/api/reports/productExpense?key={key}&department={department}&dateFrom=01.01.2023&dateTo=01.02.2023")
     root = ET.fromstring(response.content)
     expense_data = root.findall("dayDishValue")
     return expense_data

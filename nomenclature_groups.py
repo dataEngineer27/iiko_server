@@ -3,14 +3,18 @@ from helpers import crud, micro
 
 
 def app():
-    key = micro.authiiko()
+    print("Authenticated")
+    key = micro.login()
     try:
         nomenclature_groups = micro.nomenclature_groups(key=key)
     except:
-        key = micro.authiiko()
+        print("Key was expired")
+        key = micro.login()
+        print("Authenticated again")
         nomenclature_groups = micro.nomenclature_groups(key=key)
 
     crud.add_groups(db=session, group_list=nomenclature_groups)
+    micro.logout(key=key)
 
 
 if __name__ == '__main__':

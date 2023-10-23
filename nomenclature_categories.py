@@ -3,11 +3,14 @@ from helpers import crud, micro
 
 
 def app():
-    key = micro.authiiko()
+    print("Authenticated")
+    key = micro.login()
     try:
         categories = micro.category_list(key=key)
     except:
-        key = micro.authiiko()
+        print("Key was expired")
+        key = micro.login()
+        print("Authenticated again")
         categories = micro.category_list(key=key)
 
     crud.add_categories(db=session, category_list=categories)

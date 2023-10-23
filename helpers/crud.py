@@ -2,9 +2,11 @@ from sqlalchemy.orm import Session
 import models
 from sqlalchemy.exc import IntegrityError
 
+from helpers.database import session
+
 
 def add_departments(db: Session, department_list):
-    department_dict = {}
+    # department_dict = {}
     for department in department_list:
         id = department.find('id')
         id = id.text if id is not None else None
@@ -26,8 +28,9 @@ def add_departments(db: Session, department_list):
                                    tax_payer_id=tax_payer_id)
         db.add(query)
         db.commit()
-        department_dict[code] = id
-    return department_dict
+        # department_dict[code] = id
+        print("Was added department: ", name)
+    # return department_dict
 
 
 def add_categories(db: Session, category_list):
@@ -60,6 +63,7 @@ def add_groups(db: Session, group_list):
                               departments_visibility=department_list)
         db.add(query)
         db.commit()
+        print("Was added department: ", group['name'])
     return True
 
 
@@ -105,41 +109,39 @@ def add_groups(db: Session, group_list):
 
 def add_nomenclatures(db: Session, nomenclature_list):
     for nomenclature in nomenclature_list:
+        id = nomenclature['id'] if 'id' in nomenclature else None
+        group_id = nomenclature['parent'] if 'parent' in nomenclature else None
+        category_id = nomenclature['category'] if 'category' in nomenclature else None
+        accounting_category = nomenclature['accountingCategory'] if 'accountingCategory' in nomenclature else None
+        name = nomenclature['name'] if 'name' in nomenclature else None
+        num = nomenclature['num'] if 'num' in nomenclature else None
+        code = nomenclature['code'] if 'code' in nomenclature and nomenclature['code'] else None
+        main_unit = nomenclature['mainUnit'] if 'mainUnit' in nomenclature else None
+        price = nomenclature['defaultSalePrice'] if 'defaultSalePrice' in nomenclature else None
+        place_type = nomenclature['placeType'] if 'placeType' in nomenclature else None
+        included_in_menu = nomenclature[
+            'defaultIncludedInMenu'] if 'defaultIncludedInMenu' in nomenclature else None
+        product_type = nomenclature['type'] if 'type' in nomenclature else None
+        unit_weight = nomenclature['unitWeight'] if 'unitWeight' in nomenclature else None
+        query = models.Nomenclatures(id=id,
+                                     group_id=group_id,
+                                     category_id=category_id,
+                                     accounting_category=accounting_category,
+                                     name=name,
+                                     num=num,
+                                     code=code,
+                                     main_unit=main_unit,
+                                     price=price,
+                                     place_type=place_type,
+                                     included_in_menu=included_in_menu,
+                                     type=product_type,
+                                     unit_weight=unit_weight)
+        db.add(query)
         try:
-            id = nomenclature['id'] if 'id' in nomenclature else None
-            group_id = nomenclature['parent'] if 'parent' in nomenclature else None
-            category_id = nomenclature['category'] if 'category' in nomenclature else None
-            accounting_category = nomenclature['accountingCategory'] if 'accountingCategory' in nomenclature else None
-            name = nomenclature['name'] if 'name' in nomenclature else None
-            num = nomenclature['num'] if 'num' in nomenclature else None
-            code = nomenclature['code'] if 'code' in nomenclature else None
-            main_unit = nomenclature['mainUnit'] if 'mainUnit' in nomenclature else None
-            price = nomenclature['defaultSalePrice'] if 'defaultSalePrice' in nomenclature else None
-            place_type = nomenclature['placeType'] if 'placeType' in nomenclature else None
-            included_in_menu = nomenclature[
-                'defaultIncludedInMenu'] if 'defaultIncludedInMenu' in nomenclature else None
-            product_type = nomenclature['type'] if 'type' in nomenclature else None
-            unit_weight = nomenclature['unitWeight'] if 'unitWeight' in nomenclature else None
-            query = models.Nomenclatures(id=id,
-                                         group_id=group_id,
-                                         category_id=category_id,
-                                         accounting_category=accounting_category,
-                                         name=name,
-                                         num=num,
-                                         code=code,
-                                         main_unit=main_unit,
-                                         price=price,
-                                         place_type=place_type,
-                                         included_in_menu=included_in_menu,
-                                         type=product_type,
-                                         unit_weight=unit_weight)
-            db.add(query)
-            try:
-                db.commit()
-            except IntegrityError as e:
-                db.rollback()  # Rollback the transaction
-        except Exception as e:
-            pass
+            db.commit()
+            print("Was added nomenclature: ", name)
+        except IntegrityError as e:
+            db.rollback()  # Rollback the transaction
     return True
 
 
@@ -159,10 +161,11 @@ def add_roles(db: Session, role_list):
                                      deleted=deleted)
         db.add(query)
         db.commit()
+        print("Was added employee role: ", name)
     return True
 
 
-def add_employees(db: Session, employee_list, dict_department):
+def add_employees(db: Session, employee_list, department_id):
     for i in employee_list:
         id = i.find('id')
         id = id.text if id is not None else None
@@ -178,8 +181,8 @@ def add_employees(db: Session, employee_list, dict_department):
         role_codes = role_codes.text if role_codes is not None else None
         role_code = i.find('mainRoleCode')
         role_code = role_code.text if role_code is not None else None
-        department_code = i.find('departmentCodes')
-        department_code = dict_department[department_code.text] if department_code is not None else None
+        # department_code = i.find('departmentCodes')
+        # department_code = dict_department[department_code.text] if department_code is not None else None
         deleted = i.find('deleted')
         deleted = bool(deleted.text == 'true') if deleted is not None else False
         supplier = i.find('supplier')
@@ -197,7 +200,7 @@ def add_employees(db: Session, employee_list, dict_department):
                                  roles=roles,
                                  role_codes=role_codes,
                                  role_code=role_code,
-                                 department_id=department_code,
+                                 department_id=department_id,
                                  deleted=deleted,
                                  supplier=supplier,
                                  employee=employee,
@@ -205,10 +208,11 @@ def add_employees(db: Session, employee_list, dict_department):
                                  representStore=representstore)
         db.add(query)
         db.commit()
+        print("Was added employee: ", name)
     return True
 
 
-def add_shifts(db: Session, shift_list, dict_department):
+def add_shifts(db: Session, shift_list, department_id):
     # list_of_shifts = []
     for shift in shift_list:
         query = models.ShiftList(id=shift['id'],
@@ -235,12 +239,13 @@ def add_shifts(db: Session, shift_list, dict_department):
                                  session_status=shift['sessionStatus'],
                                  conception_id=shift['conceptionId'],
                                  point_of_sale_id=shift['pointOfSaleId'],
-                                 department_id=dict_department[shift['id']]
+                                 department_id=department_id
                                  )
         # list_of_shifts.append(shift['id'])
         db.add(query)
         try:
             db.commit()
+            print(f"Was added shift of department: {shift['id']} of {department_id}")
         except IntegrityError as e:
             db.rollback()  # Rollback the transaction
     # return list_of_shifts
@@ -271,15 +276,15 @@ def add_shift_payments(db: Session, shift_payments):
         db.add(query)
         try:
             db.commit()
-
+            print(f"Was added payment of shift: {payment['info']['id']} of {payment['info']['departmentId']}")
         except IntegrityError as e:
             db.rollback()
 
-        if shift_payments['sessionId'] not in department_dict.values():
-            department_dict[shift_payments['sessionId']] = payment['info']['departmentId']
+        # if shift_payments['sessionId'] not in department_dict.values():
+        #     department_dict[shift_payments['sessionId']] = payment['info']['departmentId']
 
-    return department_dict
-    # return True
+    # return department_dict
+    return True
 
 
 def add_department_revenue(db: Session, department_revenue_list, department):
@@ -297,31 +302,38 @@ def add_department_revenue(db: Session, department_revenue_list, department):
         db.add(query)
         try:
             db.commit()
-
+            print(f"Was added revenue of department: {department}")
         except IntegrityError as e:
             db.rollback()
 
     return True
 
 
-def add_product_expense(db: Session, product_expense_list, department, product_details):
+def add_product_expense(db: Session, product_expense_list, department, not_found_products):
     for i in product_expense_list:
         product_id = i.find('productId')
         product_id = product_id.text if product_id is not None else None
-        group_id = product_details.group_id
-        category_id = product_details.category_id
-        department_id = department
+        try:
+            product_details = get_product(db=session, id=product_id)
+            print("Product details type: ", type(product_details))
+            group_id = product_details.group_id
+            category_id = product_details.category_id
+            main_unit = product_details.main_unit
+        except:
+            not_found_products[f"{department}"] = product_id
+            group_id = None
+            category_id = None
+            main_unit = None
         date = i.find('date')
         date = date.text if date is not None else None
         name = i.find('productName')
         name = name.text if name is not None else None
         quantity = i.find('value')
         quantity = quantity.text if quantity is not None else None
-        main_unit = product_details.main_unit
-        query = models.ProductExpense(product_id=product_id,
+        query = models.ProductExpense(nomenclature_id=product_id,
                                       category_id=category_id,
                                       group_id=group_id,
-                                      department_id=department_id,
+                                      department_id=department,
                                       date=date,
                                       name=name,
                                       quantity=quantity,
@@ -329,9 +341,11 @@ def add_product_expense(db: Session, product_expense_list, department, product_d
         db.add(query)
         try:
             db.commit()
+            print(f"Was added product ({product_id}) expenses of department: ", department)
         except IntegrityError as e:
             db.rollback()
-    return True
+    print("\n ----------- Not found products -------------- \n", not_found_products)
+    return not_found_products
 
 
 def get_product(db: Session, id):
@@ -349,9 +363,17 @@ def get_all_shifts(db: Session):
     return query
 
 
-def update_department_revenue(db: Session, id):
-    query = db.query(models.Departments).filter(models.Departments.id == id).update({models.Departments.is_added: 1})
+def update_department(db: Session, id):
+    # query = db.query(models.Departments).get(models.Departments.id == id).update({models.Departments.is_added: 1})
+    obj = db.query(models.Departments).get(id)
+    obj.is_added = 1
     db.commit()
+
+
+def update_all_departments_is_added(db: Session, departments):
+    for department in departments:
+        db.query(models.Departments).get(department.id).update({models.Departments.is_added: 0})
+        db.commit()
     return True
 
 

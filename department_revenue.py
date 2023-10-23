@@ -3,18 +3,23 @@ from helpers import crud, micro
 
 
 def app():
-    key = micro.authiiko()
+    print("Authenticated")
+    key = micro.login()
     departments = crud.get_all_departments(db=session)
     for department in departments:
         if department.is_added == 0:
             try:
                 department_revenue = micro.department_revenue(key=key, department=department.id)
             except:
-                key = micro.authiiko()
+                print("Key was expired")
+                key = micro.login()
+                print("Authenticated again")
                 department_revenue = micro.department_revenue(key=key, department=department.id)
 
             crud.add_department_revenue(db=session, department_revenue_list=department_revenue, department=department.id)
-            crud.update_department_revenue(db=session, id=department.id)
+            crud.update_department(db=session, id=department.id)
+
+    micro.logout(key=key)
 
 
 if __name__ == '__main__':
