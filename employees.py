@@ -1,5 +1,3 @@
-import departments
-import main
 from helpers.database import session
 from helpers import crud, micro
 

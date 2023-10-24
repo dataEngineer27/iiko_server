@@ -1,5 +1,3 @@
-import main
-import payments
 from helpers.database import session
 from helpers import crud, micro
 

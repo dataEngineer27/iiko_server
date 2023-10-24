@@ -1,5 +1,4 @@
 import json
-
 from helpers.database import session
 from helpers import crud, micro
 
