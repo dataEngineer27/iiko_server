@@ -207,8 +207,11 @@ def add_employees(db: Session, employee_list, department_id):
                                  client=client,
                                  representStore=representstore)
         db.add(query)
-        db.commit()
-        print("Was added employee: ", name)
+        try:
+            db.commit()
+            print(f"Was added employee of department: {name} of {department_id}")
+        except IntegrityError as e:
+            db.rollback()  # Rollback the transaction
     return True
 
 
