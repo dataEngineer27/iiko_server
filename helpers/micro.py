@@ -55,8 +55,8 @@ def employee_roles(key):
     return corporate_item_dtos
 
 
-def employee_list(key, department_code):
-    employees = requests.get(f"{BASE_URL}/resto/api/employees?byDepartment/{department_code}&key={key}")
+def employee_list(key):
+    employees = requests.get(f"{BASE_URL}/resto/api/employees?&key={key}")
     root = ET.fromstring(employees.content)
     corporate_item_dtos = root.findall('employee')
     return corporate_item_dtos

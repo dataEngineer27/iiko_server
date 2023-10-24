@@ -165,7 +165,7 @@ def add_roles(db: Session, role_list):
     return True
 
 
-def add_employees(db: Session, employee_list, department_id):
+def add_employees(db: Session, employee_list, departments_dict):
     for i in employee_list:
         id = i.find('id')
         id = id.text if id is not None else None
@@ -181,8 +181,8 @@ def add_employees(db: Session, employee_list, department_id):
         role_codes = role_codes.text if role_codes is not None else None
         role_code = i.find('mainRoleCode')
         role_code = role_code.text if role_code is not None else None
-        # department_code = i.find('departmentCodes')
-        # department_code = dict_department[department_code.text] if department_code is not None else None
+        department_code = i.find('departmentCodes')
+        department_id = departments_dict[department_code.text] if department_code is not None else None
         deleted = i.find('deleted')
         deleted = bool(deleted.text == 'true') if deleted is not None else False
         supplier = i.find('supplier')
