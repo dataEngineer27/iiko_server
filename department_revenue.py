@@ -3,7 +3,6 @@ from helpers import crud, micro
 
 
 def app():
-    print("Authenticated")
     key = micro.login()
     departments = crud.get_all_departments(db=session)
     for department in departments:
@@ -11,10 +10,11 @@ def app():
             try:
                 department_revenue = micro.department_revenue(key=key, department=department.id)
             except:
-                print("Key was expired")
                 key = micro.login()
-                print("Authenticated again")
-                department_revenue = micro.department_revenue(key=key, department=department.id)
+                try:
+                    department_revenue = micro.department_revenue(key=key, department=department.id)
+                except SyntaxError as e:
+                    continue
 
             crud.add_department_revenue(db=session, department_revenue_list=department_revenue, department=department.id)
             crud.update_department(db=session, id=department.id)

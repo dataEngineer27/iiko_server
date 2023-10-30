@@ -19,11 +19,11 @@ import shift_list
 
 department_revenue.app()
 
-employee_roles.app()
+# employee_roles.app()
 
-employees.app()
+# employees.app()
 
-shift_list.app()
+# shift_list.app()
 
 payments.app()
 

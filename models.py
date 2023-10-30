@@ -96,6 +96,22 @@ class Departments(Base):
     product_expense = relationship('ProductExpense', back_populates='department')
 
 
+# class Stores(Base):
+#     __tablename__ = 'stores'
+#     id = Column(UUID(as_uuid=True), primary_key=True)
+#     parent_id = Column(UUID(as_uuid=True), nullable=True)
+#     code = Column(String, nullable=True)
+#     name = Column(String, nullable=True)
+#     type = Column(String, nullable=True)
+#     is_added = Column(Integer, default=0)
+#     last_update = Column(DateTime(timezone=True), default=func.now())
+#     employee = relationship('Employees', back_populates='department')
+#     shifts = relationship('ShiftList', back_populates='department')
+#     payments = relationship('ShiftPayments', back_populates='department')
+#     department_revenue = relationship('DepartmentRevenue', back_populates='department')
+#     product_expense = relationship('ProductExpense', back_populates='department')
+
+
 class DepartmentRevenue(Base):
     __tablename__ = 'department_revenue'
     id = Column(Integer, primary_key=True, index=True)

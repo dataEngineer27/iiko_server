@@ -6,7 +6,6 @@ from helpers.database import session
 
 
 def add_departments(db: Session, department_list):
-    # department_dict = {}
     for department in department_list:
         id = department.find('id')
         id = id.text if id is not None else None
@@ -28,22 +27,15 @@ def add_departments(db: Session, department_list):
                                    tax_payer_id=tax_payer_id)
         db.add(query)
         db.commit()
-        # department_dict[code] = id
-        print("Was added department: ", name)
-    # return department_dict
 
 
 def add_categories(db: Session, category_list):
-    # category_dict = {}
     for category in category_list:
         query = models.Categories(id=category['id'],
                                   deleted=category['deleted'],
                                   name=category['name'])
         db.add(query)
         db.commit()
-        print("Was added category: ", category['name'])
-        # category_dict[category['name']] = category['id']
-    # return category_dict
 
 
 def add_groups(db: Session, group_list):
@@ -63,7 +55,6 @@ def add_groups(db: Session, group_list):
                               departments_visibility=department_list)
         db.add(query)
         db.commit()
-        print("Was added department: ", group['name'])
     return True
 
 
@@ -139,7 +130,6 @@ def add_nomenclatures(db: Session, nomenclature_list):
         db.add(query)
         try:
             db.commit()
-            print("Was added nomenclature: ", name)
         except IntegrityError as e:
             db.rollback()  # Rollback the transaction
     return True
@@ -161,7 +151,6 @@ def add_roles(db: Session, role_list):
                                      deleted=deleted)
         db.add(query)
         db.commit()
-        print("Was added employee role: ", name)
     return True
 
 
@@ -209,14 +198,12 @@ def add_employees(db: Session, employee_list, departments_dict):
         db.add(query)
         try:
             db.commit()
-            print(f"Was added employee of department: {name} of {department_id}")
         except IntegrityError as e:
             db.rollback()  # Rollback the transaction
     return True
 
 
 def add_shifts(db: Session, shift_list, department_id):
-    # list_of_shifts = []
     for shift in shift_list:
         query = models.ShiftList(id=shift['id'],
                                  session_number=shift['sessionNumber'],
@@ -230,7 +217,7 @@ def add_shifts(db: Session, shift_list, department_id):
                                  responsible_user_id=shift['responsibleUserId'],
                                  session_start_cash=shift['sessionStartCash'],
                                  pay_orders=shift['payOrders'],
-                                 sum_writeoff_orders=shift['sumWriteoffOrders'],
+                                 sum_write_off_orders=shift['sumWriteoffOrders'],
                                  sales_cash=shift['salesCash'],
                                  sales_credit=shift['salesCredit'],
                                  sales_card=shift['salesCard'],
@@ -244,18 +231,14 @@ def add_shifts(db: Session, shift_list, department_id):
                                  point_of_sale_id=shift['pointOfSaleId'],
                                  department_id=department_id
                                  )
-        # list_of_shifts.append(shift['id'])
         db.add(query)
         try:
             db.commit()
-            print(f"Was added shift of department: {shift['id']} of {department_id}")
         except IntegrityError as e:
             db.rollback()  # Rollback the transaction
-    # return list_of_shifts
 
 
 def add_shift_payments(db: Session, shift_payments):
-    department_dict = {}
     for payment in shift_payments['cashlessRecords']:
         query = models.ShiftPayments(id=payment['info']['id'],
                                      shift_id=shift_payments['sessionId'],
@@ -279,15 +262,8 @@ def add_shift_payments(db: Session, shift_payments):
         db.add(query)
         try:
             db.commit()
-            print(f"Was added payment of shift: {payment['info']['id']} of {payment['info']['departmentId']}")
         except IntegrityError as e:
             db.rollback()
-
-        # if shift_payments['sessionId'] not in department_dict.values():
-        #     department_dict[shift_payments['sessionId']] = payment['info']['departmentId']
-
-    # return department_dict
-    return True
 
 
 def add_department_revenue(db: Session, department_revenue_list, department):
@@ -305,10 +281,8 @@ def add_department_revenue(db: Session, department_revenue_list, department):
         db.add(query)
         try:
             db.commit()
-            print(f"Was added revenue of department: {department}")
         except IntegrityError as e:
             db.rollback()
-
     return True
 
 
@@ -318,7 +292,6 @@ def add_product_expense(db: Session, product_expense_list, department, not_found
         product_id = product_id.text if product_id is not None else None
         try:
             product_details = get_product(db=session, id=product_id)
-            print("Product details type: ", type(product_details))
             group_id = product_details.group_id
             category_id = product_details.category_id
             main_unit = product_details.main_unit
@@ -344,10 +317,9 @@ def add_product_expense(db: Session, product_expense_list, department, not_found
         db.add(query)
         try:
             db.commit()
-            print(f"Was added product ({product_id}) expenses of department: ", department)
         except IntegrityError as e:
             db.rollback()
-    print("\n ----------- Not found products -------------- \n", not_found_products)
+
     return not_found_products
 
 
@@ -375,7 +347,8 @@ def update_department(db: Session, id):
 
 def update_all_departments_is_added(db: Session, departments):
     for department in departments:
-        db.query(models.Departments).get(department.id).update({models.Departments.is_added: 0})
+        obj = db.query(models.Departments).get(department.id)
+        obj.is_added = 0
         db.commit()
     return True
 
