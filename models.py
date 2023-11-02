@@ -23,6 +23,8 @@ class Categories(Base):
     product_expense = relationship('ProductExpense', back_populates='category')
 
 
+
+
 class Groups(Base):
     __tablename__ = 'nomenclature_groups'
     id = Column(UUID(as_uuid=True), primary_key=True)

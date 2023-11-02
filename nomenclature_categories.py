@@ -1,8 +1,9 @@
-from helpers.database import session
+from helpers.database import session,SessionLocal
 from helpers import crud, micro
 
 
-def app():
+def app(stop_event, arg):
+    session = SessionLocal()
     key = micro.login()
     try:
         categories = micro.category_list(key=key)

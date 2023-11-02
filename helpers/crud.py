@@ -25,8 +25,11 @@ def add_departments(db: Session, department_list):
                                    name=name,
                                    type=type_n,
                                    tax_payer_id=tax_payer_id)
-        db.add(query)
-        db.commit()
+        try:
+            db.add(query)
+            db.commit()
+        except IntegrityError as e:
+            db.rollback() 
 
 
 def add_categories(db: Session, category_list):
@@ -34,8 +37,11 @@ def add_categories(db: Session, category_list):
         query = models.Categories(id=category['id'],
                                   deleted=category['deleted'],
                                   name=category['name'])
-        db.add(query)
-        db.commit()
+        try:
+            db.add(query)
+            db.commit()
+        except IntegrityError as e:
+            db.rollback() 
 
 
 def add_groups(db: Session, group_list):
