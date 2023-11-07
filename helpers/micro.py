@@ -73,7 +73,7 @@ def shift_payments(key, session_id):
 
 
 def department_revenue(key, department):
-    department_data = requests.get(f"{BASE_URL}/resto/api/reports/sales?key={key}&department={department}&dateFrom=01.01.2023&dateTo=30.09.2023&dishDetails=true&allRevenue=true")
+    department_data = requests.get(f"{BASE_URL}/resto/api/reports/sales?key={key}&department={department}&dateFrom=01.01.2022&dateTo=31.12.2022&dishDetails=true&allRevenue=true")
     root = ET.fromstring(department_data.content)
     corporate_item_dtos = root.findall('dayDishValue')
     return corporate_item_dtos
