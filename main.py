@@ -39,7 +39,7 @@ threading_events = []
 
 
 def department_revenue_starter():
-    print("Job started for department_revenue")
+    # print("Job started for department_revenue")
     global pill2kill
     global t
     pill2kill = threading.Event()
@@ -59,7 +59,7 @@ def departments_starter():
 
 
 def nomenclature_categories_starter():
-    print("Job started")
+    # print("Job started")
     global pill2kill
     global t
     pill2kill = threading.Event()
@@ -69,7 +69,7 @@ def nomenclature_categories_starter():
 
 
 def nomenclatures_starter():
-    print("Job started for nomenclatures")
+    # print("Job started for nomenclatures")
     global pill2kill
     global t
     pill2kill = threading.Event()
@@ -88,7 +88,7 @@ def job_starter(app):
 
 
 def job_stopper():
-    print("Job stopped")
+    # print("Job stopped")
     for t, stop_event in threading_events:
         stop_event.set()
         t.join()
