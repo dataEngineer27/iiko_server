@@ -1,8 +1,9 @@
-from helpers.database import session
+from helpers.database import SessionLocal
 from helpers import crud, micro
 
 
 def app(stop_event, arg):
+    session = SessionLocal()
     key = micro.login()
     departments = crud.get_all_departments(db=session)
     for department in departments:
@@ -23,5 +24,5 @@ def app(stop_event, arg):
     micro.logout(key=key)
 
 
-if __name__ == '__main__':
-    app()
+# if __name__ == '__main__':
+#     app()

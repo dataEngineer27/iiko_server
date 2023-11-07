@@ -59,9 +59,11 @@ def add_groups(db: Session, group_list):
                               category_id=group['category'],
                               accountingCategory_id=group['accountingCategory'],
                               departments_visibility=department_list)
-        db.add(query)
-        db.commit()
-    return True
+        try:
+            db.add(query)
+            db.commit()
+        except IntegrityError as e:
+            db.rollback()
 
 
 # def add_tools(db:Session, lst, new_dict):
@@ -133,12 +135,11 @@ def add_nomenclatures(db: Session, nomenclature_list):
                                      included_in_menu=included_in_menu,
                                      type=product_type,
                                      unit_weight=unit_weight)
-        db.add(query)
         try:
+            db.add(query)
             db.commit()
         except IntegrityError as e:
             db.rollback()  # Rollback the transaction
-    return True
 
 
 def add_roles(db: Session, role_list):
@@ -155,9 +156,11 @@ def add_roles(db: Session, role_list):
                                      code=code,
                                      name=name,
                                      deleted=deleted)
-        db.add(query)
-        db.commit()
-    return True
+        try:
+            db.add(query)
+            db.commit()
+        except IntegrityError as e:
+            db.rollback()
 
 
 def add_employees(db: Session, employee_list, departments_dict):
@@ -201,12 +204,11 @@ def add_employees(db: Session, employee_list, departments_dict):
                                  employee=employee,
                                  client=client,
                                  representStore=representstore)
-        db.add(query)
         try:
+            db.add(query)
             db.commit()
         except IntegrityError as e:
             db.rollback()  # Rollback the transaction
-    return True
 
 
 def add_shifts(db: Session, shift_list, department_id):
@@ -237,8 +239,8 @@ def add_shifts(db: Session, shift_list, department_id):
                                  point_of_sale_id=shift['pointOfSaleId'],
                                  department_id=department_id
                                  )
-        db.add(query)
         try:
+            db.add(query)
             db.commit()
         except IntegrityError as e:
             db.rollback()  # Rollback the transaction
@@ -265,8 +267,8 @@ def add_shift_payments(db: Session, shift_payments):
                                      original_payaccount_id=payment['originalPayAccountId'],
                                      status=payment['status']
                                      )
-        db.add(query)
         try:
+            db.add(query)
             db.commit()
         except IntegrityError as e:
             db.rollback()
@@ -284,12 +286,11 @@ def add_department_revenue(db: Session, department_revenue_list, department):
                                          nomenclature_id=product_id,
                                          date=date,
                                          sum=sum)
-        db.add(query)
         try:
+            db.add(query)
             db.commit()
         except IntegrityError as e:
             db.rollback()
-    return True
 
 
 def add_product_expense(db: Session, product_expense_list, department, not_found_products):
@@ -320,8 +321,8 @@ def add_product_expense(db: Session, product_expense_list, department, not_found
                                       name=name,
                                       quantity=quantity,
                                       main_unit=main_unit)
-        db.add(query)
         try:
+            db.add(query)
             db.commit()
         except IntegrityError as e:
             db.rollback()

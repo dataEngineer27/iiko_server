@@ -5,3 +5,4 @@ requests
 python-dotenv
 alembic
 psycopg2
+schedule
