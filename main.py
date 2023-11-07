@@ -98,7 +98,7 @@ def job_stopper():
 # schedule.every().tuesday.at("12:48").do(departments_starter)  # 1
 # schedule.every().day.at("08:00").do(nomenclature_categories_starter)  # 2
 # schedule.every().day.at("13:05").do(nomenclatures_starter)  # 4
-schedule.every().day.at("15:00").do(department_revenue_starter)   # 5
+schedule.every().day.at("15:03").do(department_revenue_starter)   # 5
 
 # Stop all jobs
 schedule.every().day.at('18:00').do(job_stopper)

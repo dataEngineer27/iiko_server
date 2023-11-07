@@ -4,5 +4,5 @@ pytz
 requests
 python-dotenv
 alembic
-psycopg2
+psycopg2-binary
 schedule
