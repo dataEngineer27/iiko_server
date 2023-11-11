@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String,ForeignKey,Float,DateTime, Date, Boolean,BIGINT,Table,REAL
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime, Date, Boolean, BIGINT, DOUBLE_PRECISION
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -118,7 +118,7 @@ class DepartmentRevenue(Base):
     department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
     nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
     date = Column(Date, nullable=True)
-    sum = Column(REAL, nullable=True)
+    sum = Column(DOUBLE_PRECISION, nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
     department = relationship('Departments', back_populates='department_revenue')
     nomenclatures = relationship('Nomenclatures', back_populates='department_revenue')
@@ -168,17 +168,17 @@ class ShiftList(Base):
     accepted_date = Column(DateTime)
     manager_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
     responsible_user_id = Column(UUID(as_uuid=True), nullable=True)
-    session_start_cash = Column(REAL, nullable=True)
+    session_start_cash = Column(Float, nullable=True)
     pay_orders = Column(BIGINT, nullable=True)
     sum_write_off_orders = Column(BIGINT, nullable=True)
-    sales_cash = Column(REAL, nullable=True)
-    sales_credit = Column(REAL, nullable=True)
-    sales_card = Column(REAL, nullable=True)
-    pay_in = Column(REAL, nullable=True)
-    pay_out = Column(REAL, nullable=True)
-    pay_income = Column(REAL, nullable=True)
-    cash_remain = Column(REAL, nullable=True)
-    cash_diff = Column(REAL, nullable=True)
+    sales_cash = Column(Float, nullable=True)
+    sales_credit = Column(Float, nullable=True)
+    sales_card = Column(Float, nullable=True)
+    pay_in = Column(Float, nullable=True)
+    pay_out = Column(Float, nullable=True)
+    pay_income = Column(Float, nullable=True)
+    cash_remain = Column(Float, nullable=True)
+    cash_diff = Column(Float, nullable=True)
     session_status = Column(String, nullable=True)
     conception_id = Column(UUID(as_uuid=True), nullable=True)
     point_of_sale_id = Column(UUID(as_uuid=True), nullable=True)
