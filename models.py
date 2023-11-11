@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, String,ForeignKey,Float,DateTime,Boolean,BIGINT,Table,REAL
+from sqlalchemy import Column, Integer, String,ForeignKey,Float,DateTime, Date, Boolean,BIGINT,Table,REAL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from sqlalchemy.dialects.postgresql import UUID,ARRAY
+from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from datetime import datetime
 import uuid
 import pytz
@@ -21,8 +21,6 @@ class Categories(Base):
     groups = relationship('Groups', back_populates='category')
     nomenclatures = relationship('Nomenclatures', back_populates='category')
     product_expense = relationship('ProductExpense', back_populates='category')
-
-
 
 
 class Groups(Base):
@@ -68,7 +66,7 @@ class Nomenclatures(Base):
     name = Column(String)
     num = Column(String, nullable=True)
     code = Column(BIGINT, nullable=True)
-    main_unit = Column(String, nullable=True)
+    main_unit = Column(UUID, nullable=True)
     price = Column(Float, nullable=True)
     place_type = Column(UUID(as_uuid=True), nullable=True)
     included_in_menu = Column(Boolean, nullable=True)
@@ -116,10 +114,10 @@ class Departments(Base):
 
 class DepartmentRevenue(Base):
     __tablename__ = 'department_revenue'
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(BIGINT, primary_key=True, index=True)
     department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
     nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
-    date = Column(String, nullable=True)
+    date = Column(Date, nullable=True)
     sum = Column(REAL, nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
     department = relationship('Departments', back_populates='department_revenue')
@@ -143,7 +141,7 @@ class Employees(Base):
     name = Column(String)
     role_id = Column(UUID(as_uuid=True), ForeignKey('employee_roles.id'), nullable=True)
     roles = Column(ARRAY(UUID(as_uuid=True)))
-    role_codes = Column(String, nullable=True)
+    role_codes = Column(ARRAY(String), nullable=True)
     role_code = Column(String, nullable=True)
     department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'))
     deleted = Column(Boolean, nullable=True)

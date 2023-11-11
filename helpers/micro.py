@@ -17,7 +17,7 @@ def login():
 
 def logout(key):
     data = requests.get(f"{BASE_URL}/resto/api/logout?key={key}")
-    print(data.text)
+    # print(data.text)
 
 
 def department_list(key):
