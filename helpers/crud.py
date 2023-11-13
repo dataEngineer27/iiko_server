@@ -247,25 +247,33 @@ def add_shifts(db: Session, shift_list, department_id):
 
 
 def add_shift_payments(db: Session, shift_payments):
-    for payment in shift_payments['cashlessRecords']:
-        query = models.ShiftPayments(id=payment['info']['id'],
-                                     shift_id=shift_payments['sessionId'],
-                                     date=payment['info']['creationDate'],
-                                     group=payment['info']['group'],
-                                     account_id=payment['info']['accountId'],
-                                     counteragent_id=payment['info']['counteragentId'],
-                                     payment_type_id=payment['info']['paymentTypeId'],
-                                     type=payment['info']['paymentTypeId'],
-                                     sum=payment['info']['sum'],
-                                     user_id=payment['info']['auth']['user'],
-                                     cause_event_id=payment['info']['causeEventId'],
-                                     cashier_id=payment['info']['cashierId'],
-                                     department_id=payment['info']['departmentId'],
-                                     actual_sum=payment['actualSum'],
-                                     original_sum=payment['originalSum'],
-                                     edited_payaccount_id=payment["editedPayAccountId"],
-                                     original_payaccount_id=payment['originalPayAccountId'],
-                                     status=payment['status']
+    for payment in shift_payments['data']:
+        query = models.ShiftPayments(order_id=payment['UniqOrderId.Id'],
+                                     order_num=payment['OrderNum'],
+                                     payment_id=payment['PaymentTransaction.Id'],
+                                     created_at=payment['CloseTime'],
+                                     nomenclature_id=payment['DishId'],
+                                     nomenclature_name=payment['DishName'],
+                                     shift_id=payment['SessionID'],
+                                     shift_num=payment['SessionNum'],
+                                     cashier_id=payment['Cashier.Id'],
+                                     soldwithdish_id=payment['SoldWithDish.Id'],
+                                     soldwithitem_id=payment['SoldWithItem.Id'],
+                                     department_id=payment['Department.Id'],
+                                     ordertype_id=payment['OrderType.Id'],
+                                     ordertype=payment['OrderType'],
+                                     paymenttype_id=payment['PayTypes.GUID'],
+                                     paymenttype=payment['PayTypes'],
+                                     paymenttype_group=payment['PayTypes.Group'],
+                                     measure_unit=payment['DishMeasureUnit'],
+                                     nomenclature_amount=payment['DishAmountInt'],
+                                     sum=payment['DishSumInt'],
+                                     is_delivery=payment['Delivery.IsDelivery'],
+                                     guest_num=payment['GuestNum'],
+                                     guestcard_num=payment['OrderDiscount.GuestCard'],
+                                     guestcard_owner=payment['CardOwner'],
+                                     paymentcard_num=payment['CardNumber'],
+                                     bonuscard_num=payment['Bonus.CardNumber']
                                      )
         try:
             db.add(query)

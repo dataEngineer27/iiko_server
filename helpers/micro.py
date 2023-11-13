@@ -68,8 +68,50 @@ def shift_list(key, department_id):
 
 
 def shift_payments(key, session_id):
-    withdraw_shift = requests.get(f"{BASE_URL}/resto/api/v2/cashshifts/payments/list/{session_id}?hideAccepted=false&key={key}")
-    return withdraw_shift.json()
+    # withdraw_shift = requests.get(f"{BASE_URL}/resto/api/v2/cashshifts/payments/list/{session_id}?hideAccepted=false&key={key}")
+    url = f"{BASE_URL}/resto/api/v2/reports/olap?key={key}"
+    data_json = {
+        "reportType": "SALES",
+        "buildSummary": "false",
+        "groupByRowFields": [
+            "UniqOrderId.Id",
+            "OrderNum",
+            "PaymentTransaction.Id",
+            "CloseTime",
+            "DishId",
+            "DishName",
+            "SessionID",
+            "SessionNum",
+            "Cashier.Id",
+            "SoldWithDish.Id",
+            "SoldWithItem.Id",
+            "Department.Id",
+            "OrderType.Id",
+            "OrderType",
+            "PayTypes.GUID",
+            "PayTypes",
+            "PayTypes.Group",
+            "DishMeasureUnit",
+            "Delivery.IsDelivery",
+            "OrderDiscount.GuestCard",
+            "CardOwner",
+            "CardNumber",
+            "Bonus.CardNumber"
+        ],
+        "aggregateFields": [
+            "GuestNum",
+            "DishAmountInt",
+            "DishSumInt"
+        ],
+        "filters": {
+            "SessionID": {
+                "filterType": "IncludeValues",
+                "values": [f"{session_id}"]
+            }
+        }
+    }
+    payment_list = requests.post(url=url, json=data_json)
+    return payment_list.json()
 
 
 def department_revenue(key, department):

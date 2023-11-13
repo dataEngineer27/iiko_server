@@ -20,15 +20,15 @@ from jobs import *
 # schedule.every().day.at("08:00").do(nomenclature_categories_starter)  # 2
 # schedule.every().day.at("08:00").do(nomenclature_groups_starter)  # 3
 # schedule.every().day.at("13:05").do(nomenclatures_starter)  # 4
-schedule.every().day.at("10:14").do(department_revenue_starter)   # 5
+# schedule.every().day.at("10:14").do(department_revenue_starter)   # 5
 # schedule.every().day.at("18:16").do(employee_roles_starter)   # 6
 # schedule.every().day.at("18:16").do(employees_starter)   # 7
-schedule.every().day.at("10:50").do(shift_list_starter)   # 8
-# schedule.every().day.at("18:16").do(payments_starter)   # 9
+# schedule.every().day.at("10:50").do(shift_list_starter)   # 8
+schedule.every().day.at("01:30").do(payments_starter)   # 9
 # schedule.every().day.at("18:16").do(product_expense_starter)   # 10
 
 # Stop all jobs
-schedule.every().day.at('17:00').do(job_stopper)
+schedule.every().day.at('06:30').do(job_stopper)
 
 while True:
     time.sleep(20)
