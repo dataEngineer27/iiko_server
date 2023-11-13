@@ -248,32 +248,58 @@ def add_shifts(db: Session, shift_list, department_id):
 
 def add_shift_payments(db: Session, shift_payments):
     for payment in shift_payments['data']:
-        query = models.ShiftPayments(order_id=payment['UniqOrderId.Id'],
-                                     order_num=payment['OrderNum'],
-                                     payment_id=payment['PaymentTransaction.Id'],
-                                     created_at=payment['CloseTime'],
-                                     nomenclature_id=payment['DishId'],
-                                     nomenclature_name=payment['DishName'],
-                                     shift_id=payment['SessionID'],
-                                     shift_num=payment['SessionNum'],
-                                     cashier_id=payment['Cashier.Id'],
-                                     soldwithdish_id=payment['SoldWithDish.Id'],
-                                     soldwithitem_id=payment['SoldWithItem.Id'],
-                                     department_id=payment['Department.Id'],
-                                     ordertype_id=payment['OrderType.Id'],
-                                     ordertype=payment['OrderType'],
-                                     paymenttype_id=payment['PayTypes.GUID'],
-                                     paymenttype=payment['PayTypes'],
-                                     paymenttype_group=payment['PayTypes.Group'],
-                                     measure_unit=payment['DishMeasureUnit'],
-                                     nomenclature_amount=payment['DishAmountInt'],
-                                     sum=payment['DishSumInt'],
-                                     is_delivery=payment['Delivery.IsDelivery'],
-                                     guest_num=payment['GuestNum'],
-                                     guestcard_num=payment['OrderDiscount.GuestCard'],
-                                     guestcard_owner=payment['CardOwner'],
-                                     paymentcard_num=payment['CardNumber'],
-                                     bonuscard_num=payment['Bonus.CardNumber']
+        order_id = payment['UniqOrderId.Id'] if payment['UniqOrderId.Id'] else None
+        order_num = payment['OrderNum'] if payment['OrderNum'] else None
+        payment_id = payment['PaymentTransaction.Id'] if payment['PaymentTransaction.Id'] else None
+        created_at = payment['CloseTime'] if payment['CloseTime'] else None
+        nomenclature_id = payment['DishId'] if payment['DishId'] else None
+        nomenclature_name = payment['DishName'] if payment['DishName'] else None
+        shift_id = payment['SessionID'] if payment['SessionID'] else None
+        shift_num = payment['SessionNum'] if payment['SessionNum'] else None
+        cashier_id = payment['Cashier.Id'] if payment['Cashier.Id'] else None
+        soldwithdish_id = payment['SoldWithDish.Id'] if payment['SoldWithDish.Id'] else None
+        soldwithitem_id = payment['SoldWithItem.Id'] if payment['SoldWithItem.Id'] else None
+        department_id = payment['Department.Id'] if payment['Department.Id'] else None
+        ordertype_id = payment['OrderType.Id'] if payment['OrderType.Id'] else None
+        ordertype = payment['OrderType'] if payment['OrderType'] else None
+        paymenttype_id = payment['PayTypes.GUID'] if payment['PayTypes.GUID'] else None
+        paymenttype = payment['PayTypes'] if payment['PayTypes'] else None
+        paymenttype_group = payment['PayTypes.Group'] if payment['PayTypes.Group'] else None
+        measure_unit = payment['DishMeasureUnit'] if payment['DishMeasureUnit'] else None
+        nomenclature_amount = payment['DishAmountInt'] if payment['DishAmountInt'] else None
+        summa = payment['DishSumInt'] if payment['DishSumInt'] else None
+        is_delivery = payment['Delivery.IsDelivery'] if payment['Delivery.IsDelivery'] else None
+        guest_num = payment['GuestNum'] if payment['GuestNum'] else None
+        guestcard_num = payment['OrderDiscount.GuestCard'] if payment['OrderDiscount.GuestCard'] else None
+        guestcard_owner = payment['CardOwner'] if payment['CardOwner'] else None
+        paymentcard_num = payment['CardNumber'] if payment['CardNumber'] else None
+        bonuscard_num = payment['Bonus.CardNumber'] if payment['Bonus.CardNumber'] else None
+        query = models.ShiftPayments(order_id=order_id,
+                                     order_num=order_num,
+                                     payment_id=payment_id,
+                                     created_at=created_at,
+                                     nomenclature_id=nomenclature_id,
+                                     nomenclature_name=nomenclature_name,
+                                     shift_id=shift_id,
+                                     shift_num=shift_num,
+                                     cashier_id=cashier_id,
+                                     soldwithdish_id=soldwithdish_id,
+                                     soldwithitem_id=soldwithitem_id,
+                                     department_id=department_id,
+                                     ordertype_id=ordertype_id,
+                                     ordertype=ordertype,
+                                     paymenttype_id=paymenttype_id,
+                                     paymenttype=paymenttype,
+                                     paymenttype_group=paymenttype_group,
+                                     measure_unit=measure_unit,
+                                     nomenclature_amount=nomenclature_amount,
+                                     sum=summa,
+                                     is_delivery=is_delivery,
+                                     guest_num=guest_num,
+                                     guestcard_num=guestcard_num,
+                                     guestcard_owner=guestcard_owner,
+                                     paymentcard_num=paymentcard_num,
+                                     bonuscard_num=bonuscard_num
                                      )
         try:
             db.add(query)
