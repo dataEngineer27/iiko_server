@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, DateTime, Date, Boolean, BIGINT, DOUBLE_PRECISION
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, DECIMAL, DateTime, Date, Boolean, BIGINT, DOUBLE_PRECISION
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -77,6 +77,7 @@ class Nomenclatures(Base):
     groups = relationship('Groups', back_populates='nomenclatures')
     department_revenue = relationship('DepartmentRevenue', back_populates='nomenclatures')
     product_expense = relationship('ProductExpense', back_populates='nomenclatures')
+    payments = relationship('ShiftPayments', back_populates='nomenclatures')
 
 
 class Departments(Base):
@@ -114,7 +115,7 @@ class Departments(Base):
 
 class DepartmentRevenue(Base):
     __tablename__ = 'department_revenue'
-    id = Column(BIGINT, primary_key=True, index=True)
+    id = Column(BIGINT, primary_key=True, index=True, autoincrement=True)
     department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
     nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
     date = Column(Date, nullable=True)
@@ -192,28 +193,38 @@ class ShiftList(Base):
 
 class ShiftPayments(Base):
     __tablename__ = 'shift_payments'
-    id = Column(UUID(as_uuid=True), primary_key=True)
+    id = Column(BIGINT, primary_key=True, autoincrement=True)
+    order_id = Column(UUID(as_uuid=True), nullable=True)
+    order_num = Column(BIGINT, nullable=True)
+    payment_id = Column(UUID(as_uuid=True), nullable=True)
+    created_at = Column(DateTime(timezone=True))
+    nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
+    nomenclature_name = Column(String, nullable=True)
     shift_id = Column(UUID(as_uuid=True), ForeignKey('shift_list.id'), nullable=True)
-    date = Column(DateTime, nullable=True)
-    group = Column(String, nullable=True)
-    account_id = Column(UUID(as_uuid=True), nullable=True)
-    counteragent_id = Column(UUID(as_uuid=True), nullable=True)
-    payment_type_id = Column(UUID(as_uuid=True), nullable=True)
-    type = Column(String, nullable=True)
-    sum = Column(Float, nullable=True)
-    user_id = Column(UUID(as_uuid=True), nullable=True)
-    cause_event_id = Column(UUID(as_uuid=True), nullable=True)
+    shift_num = Column(Integer, nullable=True)
     cashier_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
+    soldwithdish_id = Column(UUID(as_uuid=True), nullable=True)
+    soldwithitem_id = Column(UUID(as_uuid=True), nullable=True)
     department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
-    actual_sum = Column(Float, nullable=True)
-    original_sum = Column(Float, nullable=True)
-    edited_payaccount_id = Column(UUID(as_uuid=True), nullable=True)
-    original_payaccount_id = Column(UUID(as_uuid=True), nullable=True)
-    status = Column(String, nullable=True)
+    ordertype_id = Column(UUID(as_uuid=True), nullable=True)
+    ordertype = Column(String, nullable=True)
+    paymenttype_id = Column(UUID(as_uuid=True), nullable=True)
+    paymenttype = Column(String, nullable=True)
+    paymenttype_group = Column(String, nullable=True)
+    measure_unit = Column(String, nullable=True)
+    nomenclature_amount = Column(DECIMAL, nullable=True)
+    sum = Column(DECIMAL, nullable=True)
+    is_delivery = Column(String, nullable=True)
+    guest_num = Column(Integer, nullable=True)
+    guestcard_num = Column(String, nullable=True)
+    guestcard_owner = Column(String, nullable=True)
+    paymentcard_num = Column(String, nullable=True)
+    bonuscard_num = Column(String, nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
     shifts = relationship('ShiftList', back_populates='payments')
     employee = relationship('Employees', back_populates='payments')
     department = relationship('Departments', back_populates='payments')
+    nomenclatures = relationship('Nomenclatures', back_populates='payments')
 
 
 class ProductExpense(Base):
