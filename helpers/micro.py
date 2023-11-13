@@ -63,7 +63,7 @@ def employee_list(key):
 
 
 def shift_list(key, department_id):
-    employee_shift = requests.get(f"{BASE_URL}/resto/api/v2/cashshifts/list?openDateFrom=2023-01-01&openDateTo=2023-09-30&departmentId={department_id}&status=ANY&key={key}")
+    employee_shift = requests.get(f"{BASE_URL}/resto/api/v2/cashshifts/list?openDateFrom=2023-01-01&openDateTo=2023-10-31&departmentId={department_id}&status=ACCEPTED&key={key}")
     return employee_shift.json()
 
 
