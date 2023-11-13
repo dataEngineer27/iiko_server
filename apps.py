@@ -70,8 +70,8 @@ def nomenclatures(stop_event, arg):
 def department_revenue(stop_event, arg):
     session = SessionLocal()
     key = micro.login()
-    departments = crud.get_all_departments(db=session)
-    for department in departments:
+    department_list = crud.get_all_departments(db=session)
+    for department in department_list:
         if stop_event.is_set():  # Check if stop event is set
             break
         if department.is_added == 0:
@@ -82,6 +82,7 @@ def department_revenue(stop_event, arg):
                 try:
                     revenue_list = micro.department_revenue(key=key, department=department.id)
                 except SyntaxError as e:
+                    crud.update_department(db=session, id=department.id)
                     continue
             crud.add_department_revenue(db=session, department_revenue_list=revenue_list, department=department.id)
             crud.update_department(db=session, id=department.id)
@@ -128,8 +129,8 @@ def employees(stop_event, arg):
 def shift_list(stop_event, arg):
     session = SessionLocal()
     key = micro.login()
-    departments = crud.get_all_departments(db=session)
-    for department in departments:
+    department_list = crud.get_all_departments(db=session)
+    for department in department_list:
         if stop_event.is_set():  # Check if stop event is set
             break
         try:
@@ -146,8 +147,8 @@ def shift_list(stop_event, arg):
 def payments(stop_event, arg):
     session = SessionLocal()
     key = micro.login()
-    shift_list = crud.get_all_shifts(db=session)
-    for shift in shift_list:
+    shifts = crud.get_all_shifts(db=session)
+    for shift in shifts:
         if stop_event.is_set():  # Check if stop event is set
             break
         if shift.is_added == 0:
@@ -166,8 +167,8 @@ def payments(stop_event, arg):
 def product_expense():
     not_found_products = {}
     key = micro.login()
-    departments = crud.get_all_departments(db=session)
-    for department in departments:
+    department_list = crud.get_all_departments(db=session)
+    for department in department_list:
         if department.is_added == 0:
             try:
                 product_expense_list = micro.product_expenses(key=key, department=department.id)
@@ -183,5 +184,5 @@ def product_expense():
             with open("not_found_products(product_expense).json", "w+") as json_file:
                 json.dump(not_found_products, json_file)
 
-    crud.update_all_departments_is_added(db=session, departments=departments)
+    crud.update_all_departments_is_added(db=session, departments=department_list)
     micro.logout(key=key)
