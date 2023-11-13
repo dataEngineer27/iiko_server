@@ -346,7 +346,6 @@ def get_all_shifts(db: Session):
 
 
 def update_department(db: Session, id):
-    # query = db.query(models.Departments).get(models.Departments.id == id).update({models.Departments.is_added: 1})
     obj = db.query(models.Departments).get(id)
     obj.is_added = 1
     db.commit()
@@ -357,10 +356,9 @@ def update_all_departments_is_added(db: Session, departments):
         obj = db.query(models.Departments).get(department.id)
         obj.is_added = 0
         db.commit()
-    return True
 
 
 def update_shift(db: Session, id):
-    query = db.query(models.ShiftList).filter(models.ShiftList.id == id).update({models.ShiftList.is_added: 1})
+    obj = db.query(models.ShiftList).get(id)
+    obj.is_added = 1
     db.commit()
-    return True
