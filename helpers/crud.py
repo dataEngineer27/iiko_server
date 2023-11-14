@@ -1,3 +1,4 @@
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 import models
 from sqlalchemy.exc import IntegrityError
@@ -274,6 +275,10 @@ def add_shift_payments(db: Session, shift_payments):
         guestcard_owner = payment['CardOwner'] if payment['CardOwner'] else None
         paymentcard_num = payment['CardNumber'] if payment['CardNumber'] else None
         bonuscard_num = payment['Bonus.CardNumber'] if payment['Bonus.CardNumber'] else None
+        available_payment_item = get_shift_payments(db=session, shift_id=shift_id, payment_id=payment_id,
+                                                    nomenclature_id=nomenclature_id)
+        if available_payment_item:
+            continue
         query = models.ShiftPayments(order_id=order_id,
                                      order_num=order_num,
                                      payment_id=payment_id,
@@ -377,6 +382,13 @@ def get_all_departments(db: Session):
 def get_all_shifts(db: Session):
     query = db.query(models.ShiftList).all()
     return query
+
+
+def get_shift_payments(db: Session, shift_id, payment_id, nomenclature_id):
+    payment_item = db.query(models.ShiftPayments).filter(and_(models.ShiftPayments.shift_id == shift_id,
+                                                              models.ShiftPayments.payment_id == payment_id,
+                                                              models.ShiftPayments.nomenclature_id == nomenclature_id))
+    return payment_item
 
 
 def update_department(db: Session, id):
