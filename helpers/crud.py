@@ -247,70 +247,65 @@ def add_shifts(db: Session, shift_list, department_id):
             db.rollback()  # Rollback the transaction
 
 
-def add_shift_payments(db: Session, shift_payments):
-    for payment in shift_payments['data']:
-        order_id = payment['UniqOrderId.Id'] if payment['UniqOrderId.Id'] else None
-        order_num = payment['OrderNum'] if payment['OrderNum'] else None
-        payment_id = payment['PaymentTransaction.Id'] if payment['PaymentTransaction.Id'] else None
-        created_at = payment['CloseTime'] if payment['CloseTime'] else None
-        nomenclature_id = payment['DishId'] if payment['DishId'] else None
-        nomenclature_name = payment['DishName'] if payment['DishName'] else None
-        shift_id = payment['SessionID'] if payment['SessionID'] else None
-        shift_num = payment['SessionNum'] if payment['SessionNum'] else None
-        cashier_id = payment['Cashier.Id'] if payment['Cashier.Id'] else None
-        soldwithdish_id = payment['SoldWithDish.Id'] if payment['SoldWithDish.Id'] else None
-        soldwithitem_id = payment['SoldWithItem.Id'] if payment['SoldWithItem.Id'] else None
-        department_id = payment['Department.Id'] if payment['Department.Id'] else None
-        ordertype_id = payment['OrderType.Id'] if payment['OrderType.Id'] else None
-        ordertype = payment['OrderType'] if payment['OrderType'] else None
-        paymenttype_id = payment['PayTypes.GUID'] if payment['PayTypes.GUID'] else None
-        paymenttype = payment['PayTypes'] if payment['PayTypes'] else None
-        paymenttype_group = payment['PayTypes.Group'] if payment['PayTypes.Group'] else None
-        measure_unit = payment['DishMeasureUnit'] if payment['DishMeasureUnit'] else None
-        nomenclature_amount = payment['DishAmountInt'] if payment['DishAmountInt'] else None
-        summa = payment['DishSumInt'] if payment['DishSumInt'] else None
-        is_delivery = payment['Delivery.IsDelivery'] if payment['Delivery.IsDelivery'] else None
-        guest_num = payment['GuestNum'] if payment['GuestNum'] else None
-        guestcard_num = payment['OrderDiscount.GuestCard'] if payment['OrderDiscount.GuestCard'] else None
-        guestcard_owner = payment['CardOwner'] if payment['CardOwner'] else None
-        paymentcard_num = payment['CardNumber'] if payment['CardNumber'] else None
-        bonuscard_num = payment['Bonus.CardNumber'] if payment['Bonus.CardNumber'] else None
-        available_payment_item = get_shift_payments(db=session, shift_id=shift_id, payment_id=payment_id,
-                                                    nomenclature_id=nomenclature_id)
-        if available_payment_item:
-            continue
-        query = models.ShiftPayments(order_id=order_id,
-                                     order_num=order_num,
-                                     payment_id=payment_id,
-                                     created_at=created_at,
-                                     nomenclature_id=nomenclature_id,
-                                     nomenclature_name=nomenclature_name,
-                                     shift_id=shift_id,
-                                     shift_num=shift_num,
-                                     cashier_id=cashier_id,
-                                     soldwithdish_id=soldwithdish_id,
-                                     soldwithitem_id=soldwithitem_id,
-                                     department_id=department_id,
-                                     ordertype_id=ordertype_id,
-                                     ordertype=ordertype,
-                                     paymenttype_id=paymenttype_id,
-                                     paymenttype=paymenttype,
-                                     paymenttype_group=paymenttype_group,
-                                     measure_unit=measure_unit,
-                                     nomenclature_amount=nomenclature_amount,
-                                     sum=summa,
-                                     is_delivery=is_delivery,
-                                     guest_num=guest_num,
-                                     guestcard_num=guestcard_num,
-                                     guestcard_owner=guestcard_owner,
-                                     paymentcard_num=paymentcard_num,
-                                     bonuscard_num=bonuscard_num
-                                     )
-        try:
-            db.add(query)
-            db.commit()
-        except IntegrityError as e:
-            db.rollback()
+def add_shift_payments(db: Session, payment):
+    order_id = payment['UniqOrderId.Id'] if payment['UniqOrderId.Id'] else None
+    order_num = payment['OrderNum'] if payment['OrderNum'] else None
+    payment_id = payment['PaymentTransaction.Id'] if payment['PaymentTransaction.Id'] else None
+    created_at = payment['CloseTime'] if payment['CloseTime'] else None
+    nomenclature_id = payment['DishId'] if payment['DishId'] else None
+    nomenclature_name = payment['DishName'] if payment['DishName'] else None
+    shift_id = payment['SessionID'] if payment['SessionID'] else None
+    shift_num = payment['SessionNum'] if payment['SessionNum'] else None
+    cashier_id = payment['Cashier.Id'] if payment['Cashier.Id'] else None
+    soldwithdish_id = payment['SoldWithDish.Id'] if payment['SoldWithDish.Id'] else None
+    soldwithitem_id = payment['SoldWithItem.Id'] if payment['SoldWithItem.Id'] else None
+    department_id = payment['Department.Id'] if payment['Department.Id'] else None
+    ordertype_id = payment['OrderType.Id'] if payment['OrderType.Id'] else None
+    ordertype = payment['OrderType'] if payment['OrderType'] else None
+    paymenttype_id = payment['PayTypes.GUID'] if payment['PayTypes.GUID'] else None
+    paymenttype = payment['PayTypes'] if payment['PayTypes'] else None
+    paymenttype_group = payment['PayTypes.Group'] if payment['PayTypes.Group'] else None
+    measure_unit = payment['DishMeasureUnit'] if payment['DishMeasureUnit'] else None
+    nomenclature_amount = payment['DishAmountInt'] if payment['DishAmountInt'] else None
+    summa = payment['DishSumInt'] if payment['DishSumInt'] else None
+    is_delivery = payment['Delivery.IsDelivery'] if payment['Delivery.IsDelivery'] else None
+    guest_num = payment['GuestNum'] if payment['GuestNum'] else None
+    guestcard_num = payment['OrderDiscount.GuestCard'] if payment['OrderDiscount.GuestCard'] else None
+    guestcard_owner = payment['CardOwner'] if payment['CardOwner'] else None
+    paymentcard_num = payment['CardNumber'] if payment['CardNumber'] else None
+    bonuscard_num = payment['Bonus.CardNumber'] if payment['Bonus.CardNumber'] else None
+    query = models.ShiftPayments(order_id=order_id,
+                                 order_num=order_num,
+                                 payment_id=payment_id,
+                                 created_at=created_at,
+                                 nomenclature_id=nomenclature_id,
+                                 nomenclature_name=nomenclature_name,
+                                 shift_id=shift_id,
+                                 shift_num=shift_num,
+                                 cashier_id=cashier_id,
+                                 soldwithdish_id=soldwithdish_id,
+                                 soldwithitem_id=soldwithitem_id,
+                                 department_id=department_id,
+                                 ordertype_id=ordertype_id,
+                                 ordertype=ordertype,
+                                 paymenttype_id=paymenttype_id,
+                                 paymenttype=paymenttype,
+                                 paymenttype_group=paymenttype_group,
+                                 measure_unit=measure_unit,
+                                 nomenclature_amount=nomenclature_amount,
+                                 sum=summa,
+                                 is_delivery=is_delivery,
+                                 guest_num=guest_num,
+                                 guestcard_num=guestcard_num,
+                                 guestcard_owner=guestcard_owner,
+                                 paymentcard_num=paymentcard_num,
+                                 bonuscard_num=bonuscard_num
+                                 )
+    try:
+        db.add(query)
+        db.commit()
+    except IntegrityError as e:
+        db.rollback()
 
 
 def add_department_revenue(db: Session, department_revenue_list, department):
@@ -384,11 +379,18 @@ def get_all_shifts(db: Session):
     return query
 
 
-def get_shift_payments(db: Session, shift_id, payment_id, nomenclature_id):
+def get_payment_item(db: Session, shift_id, payment_id, nomenclature_id):
     payment_item = db.query(models.ShiftPayments).filter(and_(models.ShiftPayments.shift_id == shift_id,
                                                               models.ShiftPayments.payment_id == payment_id,
-                                                              models.ShiftPayments.nomenclature_id == nomenclature_id))
+                                                              models.ShiftPayments.nomenclature_id == nomenclature_id)
+                                                         ).first()
     return payment_item
+
+
+def get_last_added_shift(db: Session):
+    last_payment = db.query(models.ShiftPayments).filter(models.ShiftPayments.last_update.desc).first()
+    last_added_shift = last_payment.shift_id
+    return last_added_shift
 
 
 def update_department(db: Session, id):

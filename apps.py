@@ -1,6 +1,5 @@
 import json
-
-from helpers.database import SessionLocal, session
+from helpers.database import SessionLocal
 from helpers import crud, micro
 
 
@@ -11,11 +10,11 @@ def departments(stop_event, arg):
         micro.logout(key=key)
         return
     try:
-        departments = micro.department_list(key=key)
+        department_list = micro.department_list(key=key)
     except:
         key = micro.login()
-        departments = micro.department_list(key=key)
-    crud.add_departments(db=session, department_list=departments)
+        department_list = micro.department_list(key=key)
+    crud.add_departments(db=session, department_list=department_list)
     micro.logout(key=key)
 
 
@@ -148,6 +147,7 @@ def payments(stop_event, arg):
     session = SessionLocal()
     key = micro.login()
     shifts = crud.get_all_shifts(db=session)
+    last_processed_shift = crud.get_last_added_shift(db=session)
     for shift in shifts:
         if stop_event.is_set():  # Check if stop event is set
             break
@@ -157,8 +157,21 @@ def payments(stop_event, arg):
             except:
                 key = micro.login()
                 shift_payments = micro.shift_payments(key=key, session_id=shift.id)
-
-            crud.add_shift_payments(db=session, shift_payments=shift_payments)
+            if shift.id == last_processed_shift:
+                for payment in shift_payments['data']:
+                    payment_id = payment['PaymentTransaction.Id'] if payment['PaymentTransaction.Id'] else None
+                    nomenclature_id = payment['DishId'] if payment['DishId'] else None
+                    available_payment_item = crud.get_payment_item(db=session,
+                                                                   shift_id=shift.id,
+                                                                   payment_id=payment_id,
+                                                                   nomenclature_id=nomenclature_id)
+                    if available_payment_item:
+                        continue
+                    else:
+                        crud.add_shift_payments(db=session, payment=payment)
+            else:
+                for payment in shift_payments['data']:
+                    crud.add_shift_payments(db=session, payment=payment)
             crud.update_shift(db=session, id=shift.id)
 
     micro.logout(key=key)
