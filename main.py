@@ -24,7 +24,7 @@ from jobs import *
 # schedule.every().day.at("18:16").do(employee_roles_starter)   # 6
 # schedule.every().day.at("18:16").do(employees_starter)   # 7
 # schedule.every().day.at("10:50").do(shift_list_starter)   # 8
-schedule.every().day.at("14:40").do(payments_starter)   # 9
+schedule.every().day.at("14:50").do(payments_starter)   # 9
 # schedule.every().day.at("18:16").do(product_expense_starter)   # 10
 
 # Stop all jobs

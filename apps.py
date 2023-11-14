@@ -178,6 +178,7 @@ def payments(stop_event, arg):
 
 
 def product_expense():
+    session = SessionLocal()
     not_found_products = {}
     key = micro.login()
     department_list = crud.get_all_departments(db=session)
