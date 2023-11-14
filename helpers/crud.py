@@ -388,7 +388,7 @@ def get_payment_item(db: Session, shift_id, payment_id, nomenclature_id):
 
 
 def get_last_added_shift(db: Session):
-    last_payment = db.query(models.ShiftPayments).filter(models.ShiftPayments.last_update.desc).first()
+    last_payment = db.query(models.ShiftPayments).order_by(models.ShiftPayments.last_update.desc()).first()
     last_added_shift = last_payment.shift_id
     return last_added_shift
 
