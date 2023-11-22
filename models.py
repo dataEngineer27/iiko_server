@@ -78,6 +78,9 @@ class Nomenclatures(Base):
     department_revenue = relationship('DepartmentRevenue', back_populates='nomenclatures')
     product_expense = relationship('ProductExpense', back_populates='nomenclatures')
     payments = relationship('ShiftPayments', back_populates='nomenclatures')
+    remains = relationship('StoreRemains', back_populates='nomenclatures')
+    incomings = relationship('StoreIncomings', back_populates='nomenclatures')
+    units = relationship('ReferenceUnits', back_populates='nomenclatures')
 
 
 class Departments(Base):
@@ -95,22 +98,89 @@ class Departments(Base):
     payments = relationship('ShiftPayments', back_populates='department')
     department_revenue = relationship('DepartmentRevenue', back_populates='department')
     product_expense = relationship('ProductExpense', back_populates='department')
+    store = relationship('Stores', back_populates='department')
 
 
-# class Stores(Base):
-#     __tablename__ = 'stores'
-#     id = Column(UUID(as_uuid=True), primary_key=True)
-#     parent_id = Column(UUID(as_uuid=True), nullable=True)
-#     code = Column(String, nullable=True)
-#     name = Column(String, nullable=True)
-#     type = Column(String, nullable=True)
-#     is_added = Column(Integer, default=0)
-#     last_update = Column(DateTime(timezone=True), default=func.now())
-#     employee = relationship('Employees', back_populates='department')
-#     shifts = relationship('ShiftList', back_populates='department')
-#     payments = relationship('ShiftPayments', back_populates='department')
-#     department_revenue = relationship('DepartmentRevenue', back_populates='department')
-#     product_expense = relationship('ProductExpense', back_populates='department')
+class Stores(Base):
+    __tablename__ = 'stores'
+    id = Column(UUID(as_uuid=True), primary_key=True)
+    department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
+    code = Column(String, nullable=True)
+    name = Column(String, nullable=True)
+    type = Column(String, nullable=True)
+    last_update = Column(DateTime(timezone=True), default=func.now())
+    is_added = Column(Integer, default=0)
+    department = relationship('Departments', back_populates='store')
+    remains = relationship('StoreRemains', back_populates='store')
+    incomings = relationship('StoreIncomings', back_populates='store')
+
+
+class StoreRemains(Base):
+    __tablename__ = 'store_remains'
+    id = Column(BIGINT, primary_key=True, index=True, autoincrement=True)
+    store_id = Column(UUID(as_uuid=True), ForeignKey('stores.id'), nullable=True)
+    nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
+    datetime = Column(DateTime(timezone=True))
+    amount = Column(DECIMAL, nullable=True)
+    sum = Column(DECIMAL, nullable=True)
+    last_update = Column(DateTime(timezone=True), default=func.now())
+    store = relationship('Stores', back_populates='remains')
+    nomenclatures = relationship('Nomenclatures', back_populates='remains')
+
+
+class StoreIncomings(Base):
+    __tablename__ = 'store_incomings'
+    id = Column(BIGINT, primary_key=True, index=True, autoincrement=True)
+    incoming_invoice_id = Column(UUID(as_uuid=True), nullable=True)
+    doc_number = Column(String, nullable=True)
+    incoming_date = Column(DateTime(timezone=True))
+    due_date = Column(DateTime(timezone=True))
+    supplier_id = Column(UUID(as_uuid=True), nullable=True)
+    store_id = Column(UUID(as_uuid=True), ForeignKey('stores.id'), nullable=True)
+    actual_amount = Column(DECIMAL, nullable=True)
+    price = Column(DECIMAL, nullable=True)
+    price_withoutVat = Column(DECIMAL, nullable=True)
+    sum = Column(DECIMAL, nullable=True)
+    measureunit_id = Column(UUID(as_uuid=True), ForeignKey('reference_units.id'), nullable=True)
+    nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
+    amount = Column(DECIMAL, nullable=True)
+    last_update = Column(DateTime(timezone=True), default=func.now())
+    store = relationship('Stores', back_populates='incomings')
+    nomenclatures = relationship('Nomenclatures', back_populates='incomings')
+    units = relationship('ReferenceUnits', back_populates='incomings')
+    sendings = relationship('StoreSendings', back_populates='incomings')
+
+
+class StoreSendings(Base):
+    __tablename__ = 'store_sendings'
+    id = Column(BIGINT, primary_key=True, index=True, autoincrement=True)
+    outgoing_invoice_id = Column(UUID(as_uuid=True), nullable=True)
+    doc_number = Column(String, nullable=True)
+    incoming_date = Column(DateTime(timezone=True))
+    store_id = Column(UUID(as_uuid=True), ForeignKey('stores.id'), nullable=True)
+    supplier_id = Column(UUID(as_uuid=True), nullable=True)
+    incominginvoice_id = Column(UUID(as_uuid=True), nullable=True)
+    nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
+    price = Column(DECIMAL, nullable=True)
+    price_withoutVat = Column(DECIMAL, nullable=True)
+    amount = Column(DECIMAL, nullable=True)
+    sum = Column(DECIMAL, nullable=True)
+    last_update = Column(DateTime(timezone=True), default=func.now())
+    store = relationship('Stores', back_populates='sendings')
+    incomings = relationship('StoreIncomings', back_populates='sendings')
+    nomenclatures = relationship('Nomenclatures', back_populates='sendings')
+
+
+class ReferenceUnits(Base):
+    __tablename__ = 'reference_units'
+    id = Column(UUID(as_uuid=True), primary_key=True, nullable=True)
+    type = Column(String, nullable=True)
+    deleted = Column(Boolean, nullable=True)
+    code = Column(String, nullable=True)
+    name = Column(String, nullable=True)
+    incomings = relationship('StoreIncomings', back_populates='units')
+    nomenclatures = relationship('Nomenclatures', back_populates='units')
+    payments = relationship('ShiftPayments', back_populates='units')
 
 
 class DepartmentRevenue(Base):
@@ -170,8 +240,8 @@ class ShiftList(Base):
     manager_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
     responsible_user_id = Column(UUID(as_uuid=True), nullable=True)
     session_start_cash = Column(Float, nullable=True)
-    pay_orders = Column(BIGINT, nullable=True)
-    sum_write_off_orders = Column(BIGINT, nullable=True)
+    pay_orders = Column(DECIMAL, nullable=True)
+    sum_write_off_orders = Column(DECIMAL, nullable=True)
     sales_cash = Column(Float, nullable=True)
     sales_credit = Column(Float, nullable=True)
     sales_card = Column(Float, nullable=True)
@@ -206,9 +276,9 @@ class ShiftPayments(Base):
     soldwithdish_id = Column(UUID(as_uuid=True), nullable=True)
     soldwithitem_id = Column(UUID(as_uuid=True), nullable=True)
     department_id = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
-    ordertype_id = Column(UUID(as_uuid=True), nullable=True)
+    ordertype_id = Column(UUID(as_uuid=True), ForeignKey('reference_units.id'), nullable=True)
     ordertype = Column(String, nullable=True)
-    paymenttype_id = Column(UUID(as_uuid=True), nullable=True)
+    paymenttype_id = Column(UUID(as_uuid=True), ForeignKey('reference_units.id'), nullable=True)
     paymenttype = Column(String, nullable=True)
     paymenttype_group = Column(String, nullable=True)
     measure_unit = Column(String, nullable=True)
@@ -225,6 +295,7 @@ class ShiftPayments(Base):
     employee = relationship('Employees', back_populates='payments')
     department = relationship('Departments', back_populates='payments')
     nomenclatures = relationship('Nomenclatures', back_populates='payments')
+    units = relationship('ReferenceUnits', back_populates='payments')
 
 
 class ProductExpense(Base):
