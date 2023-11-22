@@ -1,5 +1,7 @@
 import requests
-import os 
+import os
+
+import xmltodict
 from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
 
@@ -25,6 +27,14 @@ def department_list(key):
     root = ET.fromstring(departments.content)
     corporate_item_dtos = root.findall('corporateItemDto')
     return corporate_item_dtos
+
+
+def store_list(key):
+    url = f"{BASE_URL}/resto/api/corporation/stores?key={key}"
+    res = requests.get(url=url)
+    data_xml = res.text
+    data_dict = xmltodict.parse(data_xml)
+    return data_dict
 
 
 def category_list(key):
