@@ -64,6 +64,7 @@ class Nomenclatures(Base):
     remains = relationship('StoreRemains', back_populates='nomenclatures')
     incomings = relationship('StoreIncomings', back_populates='nomenclatures')
     units = relationship('ReferenceUnits', back_populates='nomenclatures')
+    sendings = relationship('StoreSendings', back_populates='nomenclatures')
 
 
 class Departments(Base):
