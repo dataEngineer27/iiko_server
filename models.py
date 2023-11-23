@@ -49,7 +49,7 @@ class Nomenclatures(Base):
     name = Column(String)
     num = Column(String, nullable=True)
     code = Column(BIGINT, nullable=True)
-    main_unit = Column(UUID, nullable=True)
+    main_unit = Column(UUID, ForeignKey('reference_units.id'), nullable=True)
     price = Column(Float, nullable=True)
     place_type = Column(UUID(as_uuid=True), nullable=True)
     included_in_menu = Column(Boolean, nullable=True)
