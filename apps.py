@@ -162,7 +162,7 @@ def payments(stop_event, arg):
     session = SessionLocal()
     key = micro.login()
     shifts = crud.get_all_shifts(db=session)
-    last_processed_shift = crud.get_last_added_shift(db=session)
+    last_processed_payment = crud.get_last_added_payment(db=session)
     for shift in shifts:
         if stop_event.is_set():  # Check if stop event is set
             break
@@ -172,7 +172,7 @@ def payments(stop_event, arg):
             except:
                 key = micro.login()
                 shift_payments = micro.shift_payments(key=key, session_id=shift.id)
-            if shift.id == last_processed_shift:
+            if last_processed_payment is not None and shift.id == last_processed_payment.shift_id:
                 for payment in shift_payments['data']:
                     payment_id = payment['PaymentTransaction.Id'] if payment['PaymentTransaction.Id'] else None
                     nomenclature_id = payment['DishId'] if payment['DishId'] else None

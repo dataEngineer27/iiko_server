@@ -165,7 +165,10 @@ class ReferenceUnits(Base):
     name = Column(String, nullable=True)
     incomings = relationship('StoreIncomings', back_populates='units')
     nomenclatures = relationship('Nomenclatures', back_populates='units')
-    payments = relationship('ShiftPayments', back_populates='units')
+    # payments_ordertype = relationship('ShiftPayments', back_populates='ordertype_fk')
+    # payments_paymenttype = relationship('ShiftPayments', back_populates='paymenttype_fk')
+    # payments_orderdiscount_type = relationship('ShiftPayments', back_populates='orderdiscount_type_fk')
+    # payments_orderincrease_type = relationship('ShiftPayments', back_populates='orderincrease_type_fk')
 
 
 class DepartmentRevenue(Base):
@@ -292,7 +295,10 @@ class ShiftPayments(Base):
     employee = relationship('Employees', back_populates='payments')
     department = relationship('Departments', back_populates='payments')
     nomenclatures = relationship('Nomenclatures', back_populates='payments')
-    units = relationship('ReferenceUnits', back_populates='payments')
+    ordertype_fk = relationship('ReferenceUnits', backref='payments_ordertype', uselist=False, foreign_keys="ShiftPayments.ordertype_id")
+    paymenttype_fk = relationship('ReferenceUnits', backref='payments_paymenttype', uselist=False, foreign_keys="ShiftPayments.paymenttype_id")
+    orderdiscount_type_fk = relationship('ReferenceUnits', backref='payments_orderdiscount_type', uselist=False, foreign_keys="ShiftPayments.orderdiscount_type_id")
+    orderincrease_type_fk = relationship('ReferenceUnits', backref='payments_orderincrease_type', uselist=False, foreign_keys="ShiftPayments.orderincrease_type_id")
 
 
 class ProductExpense(Base):
