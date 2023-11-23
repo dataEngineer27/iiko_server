@@ -131,7 +131,7 @@ class StoreIncomings(Base):
     store = relationship('Stores', back_populates='incomings')
     nomenclatures = relationship('Nomenclatures', back_populates='incomings')
     units = relationship('ReferenceUnits', back_populates='incomings')
-    sendings = relationship('StoreSendings', back_populates='incomings')
+    # sendings = relationship('StoreSendings', back_populates='incomings')
 
 
 class StoreSendings(Base):
@@ -150,7 +150,7 @@ class StoreSendings(Base):
     sum = Column(DECIMAL, nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
     store = relationship('Stores', back_populates='sendings')
-    incomings = relationship('StoreIncomings', back_populates='sendings')
+    # incomings = relationship('StoreIncomings', back_populates='sendings')
     nomenclatures = relationship('Nomenclatures', back_populates='sendings')
 
 
