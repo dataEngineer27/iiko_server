@@ -33,6 +33,27 @@ def add_departments(db: Session, department_list):
             db.rollback() 
 
 
+def add_stores(db: Session, store_list):
+    for store in store_list:
+        id = store['id'] if 'id' in store else None
+        department_id = store['parentId'] if 'parentId' in store else None
+        code = store['code'] if 'code' in store and store['code'] else None
+        name = store['name'] if 'name' in store else None
+        type = store['type'] if 'type' in store else None
+
+        query = models.Stores(id=id,
+                              department_id=department_id,
+                              code=code,
+                              name=name,
+                              type=type
+                              )
+        try:
+            db.add(query)
+            db.commit()
+        except IntegrityError as e:
+            db.rollback()  # Rollback the transaction
+
+
 def add_categories(db: Session, category_list):
     for category in category_list:
         query = models.Categories(id=category['id'],

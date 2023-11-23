@@ -18,6 +18,21 @@ def departments(stop_event, arg):
     micro.logout(key=key)
 
 
+def stores(stop_event, arg):
+    session = SessionLocal()
+    key = micro.login()
+    if stop_event.is_set():  # Check if stop event is set
+        micro.logout(key=key)
+        return
+    try:
+        store_list = micro.store_list(key=key)
+    except:
+        key = micro.login()
+        store_list = micro.store_list(key=key)
+    crud.add_stores(db=session, store_list=store_list)
+    micro.logout(key=key)
+
+
 def nomenclature_categories(stop_event, arg):
     session = SessionLocal()
     key = micro.login()
