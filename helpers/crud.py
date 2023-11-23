@@ -267,13 +267,25 @@ def add_shift_payments(db: Session, payment):
     paymenttype_group = payment['PayTypes.Group'] if payment['PayTypes.Group'] else None
     measure_unit = payment['DishMeasureUnit'] if payment['DishMeasureUnit'] else None
     nomenclature_amount = payment['DishAmountInt'] if payment['DishAmountInt'] else None
-    summa = payment['DishSumInt'] if payment['DishSumInt'] else None
+    nomenclature_sum = payment['DishSumInt'] if payment['DishSumInt'] else None
     is_delivery = payment['Delivery.IsDelivery'] if payment['Delivery.IsDelivery'] else None
     guest_num = payment['GuestNum'] if payment['GuestNum'] else None
     guestcard_num = payment['OrderDiscount.GuestCard'] if payment['OrderDiscount.GuestCard'] else None
     guestcard_owner = payment['CardOwner'] if payment['CardOwner'] else None
     paymentcard_num = payment['CardNumber'] if payment['CardNumber'] else None
     bonuscard_num = payment['Bonus.CardNumber'] if payment['Bonus.CardNumber'] else None
+    orderdiscount_type = payment['OrderDiscount.Type'] if payment['OrderDiscount.Type'] else None
+    orderdiscount_type_id = payment['OrderDiscount.Type.IDs'] if payment['OrderDiscount.Type.IDs'] else None
+    orderincrease_type = payment['OrderIncrease.Type'] if payment['OrderIncrease.Type'] else None
+    orderincrease_type_id = payment['OrderIncrease.Type.IDs'] if payment['OrderIncrease.Type.IDs'] else None
+    itemsalediscount_name = payment['ItemSaleEventDiscountType'] if payment['ItemSaleEventDiscountType'] else None
+    fiscalcheque_num = payment['FiscalChequeNumber'] if payment['FiscalChequeNumber'] else None
+    discountdish_num = payment['ItemSaleEventDiscountType.DiscountAmount'] if payment['ItemSaleEventDiscountType.DiscountAmount'] else None
+    discount_percent = payment['DiscountPercent'] if payment['DiscountPercent'] else None
+    discount_sum = payment['DiscountSum'] if payment['DiscountSum'] else None
+    increase_percent = payment['IncreasePercent'] if payment['IncreasePercent'] else None
+    increase_sum = payment['IncreaseSum'] if payment['IncreaseSum'] else None
+    full_sum = payment['fullSum'] if payment['fullSum'] else None
     query = models.ShiftPayments(order_id=order_id,
                                  order_num=order_num,
                                  payment_id=payment_id,
@@ -293,13 +305,25 @@ def add_shift_payments(db: Session, payment):
                                  paymenttype_group=paymenttype_group,
                                  measure_unit=measure_unit,
                                  nomenclature_amount=nomenclature_amount,
-                                 sum=summa,
+                                 nomenclature_sum=nomenclature_sum,
                                  is_delivery=is_delivery,
                                  guest_num=guest_num,
                                  guestcard_num=guestcard_num,
                                  guestcard_owner=guestcard_owner,
                                  paymentcard_num=paymentcard_num,
-                                 bonuscard_num=bonuscard_num
+                                 bonuscard_num=bonuscard_num,
+                                 orderdiscount_type=orderdiscount_type,
+                                 orderdiscount_type_id=orderdiscount_type_id,
+                                 orderincrease_type=orderincrease_type,
+                                 orderincrease_type_id=orderincrease_type_id,
+                                 itemsalediscount_name=itemsalediscount_name,
+                                 fiscalcheque_num=fiscalcheque_num,
+                                 discountdish_num=discountdish_num,
+                                 discount_percent=discount_percent,
+                                 discount_sum=discount_sum,
+                                 increase_percent=increase_percent,
+                                 increase_sum=increase_sum,
+                                 full_sum=full_sum
                                  )
     try:
         db.add(query)

@@ -40,23 +40,6 @@ class Groups(Base):
     product_expense = relationship('ProductExpense', back_populates='groups')
 
 
-# class Tools(Base):
-#     __tablename__ = 'products'
-#     id = Column(UUID(as_uuid=True), primary_key=True)
-#     parent_id = Column(UUID(as_uuid=True), ForeignKey('nomenclature_groups.id'))
-#     groups = relationship('Groups', back_populates='tools')
-#     name = Column(String)
-#     num = Column(String, nullable=True)
-#     code = Column(String, nullable=True)
-#     product_type = Column(String, nullable=True)
-#     cooking_place_type = Column(String, nullable=True)
-#     main_unit = Column(String, nullable=True)
-#     category_id = Column(UUID(as_uuid=True), ForeignKey('user_categories.id'), nullable=True)
-#     user_category = relationship('Categories', back_populates='user_tool')
-#     last_update = Column(DateTime(timezone=True), default=func.now())
-#     product_expense = relationship('ProductExpense', back_populates='products')
-
-
 class Nomenclatures(Base):
     __tablename__ = 'nomenclatures'
     id = Column(UUID(as_uuid=True), primary_key=True)
@@ -173,7 +156,7 @@ class StoreSendings(Base):
 
 class ReferenceUnits(Base):
     __tablename__ = 'reference_units'
-    id = Column(UUID(as_uuid=True), primary_key=True, nullable=True)
+    id = Column(UUID(as_uuid=True), primary_key=True)
     type = Column(String, nullable=True)
     deleted = Column(Boolean, nullable=True)
     code = Column(String, nullable=True)
@@ -283,13 +266,25 @@ class ShiftPayments(Base):
     paymenttype_group = Column(String, nullable=True)
     measure_unit = Column(String, nullable=True)
     nomenclature_amount = Column(DECIMAL, nullable=True)
-    sum = Column(DECIMAL, nullable=True)
+    nomenclature_sum = Column(DECIMAL, nullable=True)
     is_delivery = Column(String, nullable=True)
     guest_num = Column(Integer, nullable=True)
     guestcard_num = Column(String, nullable=True)
     guestcard_owner = Column(String, nullable=True)
     paymentcard_num = Column(String, nullable=True)
     bonuscard_num = Column(String, nullable=True)
+    orderdiscount_type = Column(String, nullable=True)
+    orderdiscount_type_id = Column(UUID(as_uuid=True), ForeignKey('reference_units.id'), nullable=True)
+    orderincrease_type = Column(String, nullable=True)
+    orderincrease_type_id = Column(UUID(as_uuid=True), ForeignKey('reference_units.id'), nullable=True)
+    itemsalediscount_name = Column(String, nullable=True)
+    fiscalcheque_num = Column(Integer, nullable=True)
+    discountdish_num = Column(DECIMAL, nullable=True)
+    discount_percent = Column(DECIMAL, nullable=True)
+    discount_sum = Column(DECIMAL, nullable=True)
+    increase_percent = Column(DECIMAL, nullable=True)
+    increase_sum = Column(DECIMAL, nullable=True)
+    full_sum = Column(DECIMAL, nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
     shifts = relationship('ShiftList', back_populates='payments')
     employee = relationship('Employees', back_populates='payments')

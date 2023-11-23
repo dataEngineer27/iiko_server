@@ -68,40 +68,55 @@ def shift_list(key, department_id):
 
 
 def shift_payments(key, session_id):
-    # withdraw_shift = requests.get(f"{BASE_URL}/resto/api/v2/cashshifts/payments/list/{session_id}?hideAccepted=false&key={key}")
     url = f"{BASE_URL}/resto/api/v2/reports/olap?key={key}"
     data_json = {
         "reportType": "SALES",
         "buildSummary": "false",
-        "groupByRowFields": [
-            "UniqOrderId.Id",
-            "OrderNum",
-            "PaymentTransaction.Id",
-            "CloseTime",
-            "DishId",
-            "DishName",
-            "SessionID",
-            "SessionNum",
-            "Cashier.Id",
-            "SoldWithDish.Id",
-            "SoldWithItem.Id",
+        "groupByColFields": [
             "Department.Id",
-            "OrderType.Id",
+            "SessionNum",
+            "SessionID",
             "OrderType",
-            "PayTypes.GUID",
-            "PayTypes",
-            "PayTypes.Group",
-            "DishMeasureUnit",
+            "OrderType.Id",
+            "OrderNum",
+            "UniqOrderId.Id",
             "Delivery.IsDelivery",
-            "OrderDiscount.GuestCard",
             "CardOwner",
             "CardNumber",
-            "Bonus.CardNumber"
+            "OrderDiscount.GuestCard",
+            "Bonus.CardNumber",
+            "PayTypes.Group",
+            "PayTypes",
+            "PayTypes.GUID",
+            "PaymentTransaction.Id",
+            "PaymentTransaction.Ids",
+            "Cashier.Id",
+            "DishId",
+            "DishName",
+            "SoldWithDish.Id",
+            "SoldWithItem.Id",
+            "DishMeasureUnit",
+            "OrderDiscount.Type",
+            "OrderDiscount.Type.IDs",
+            "OrderIncrease.Type",
+            "OrderIncrease.Type.IDs",
+            "ItemSaleEventDiscountType",
+            "DiscountPercent",
+            "IncreasePercent",
+            "CloseTime",
+            "FiscalChequeNumber",
+            "PriceCategory"
         ],
         "aggregateFields": [
             "GuestNum",
+            "UniqOrderId",
+            "OrderItems",
+            "ItemSaleEventDiscountType.DiscountAmount",
             "DishAmountInt",
-            "DishSumInt"
+            "DishSumInt",
+            "DiscountSum",
+            "IncreaseSum",
+            "fullSum"
         ],
         "filters": {
             "SessionID": {
