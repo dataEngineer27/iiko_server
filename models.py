@@ -96,6 +96,7 @@ class Stores(Base):
     department = relationship('Departments', back_populates='store')
     remains = relationship('StoreRemains', back_populates='store')
     incomings = relationship('StoreIncomings', back_populates='store')
+    sendings = relationship('StoreSendings', back_populates='store')
 
 
 class StoreRemains(Base):
