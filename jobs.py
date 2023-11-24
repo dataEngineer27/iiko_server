@@ -106,6 +106,24 @@ def product_expense_starter():
     threading_events.append((t, pill2kill))
 
 
+def stores_starter():
+    global pill2kill
+    global t
+    pill2kill = threading.Event()
+    t = threading.Thread(target=apps.stores, args=(pill2kill, 'task'))
+    t.start()
+    threading_events.append((t, pill2kill))
+
+
+def store_remains_starter():
+    global pill2kill
+    global t
+    pill2kill = threading.Event()
+    t = threading.Thread(target=apps.store_remains, args=(pill2kill, 'task'))
+    t.start()
+    threading_events.append((t, pill2kill))
+
+
 def job_starter(app):
     global pill2kill
     global t

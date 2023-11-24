@@ -1,3 +1,4 @@
+import datetime
 import json
 from helpers.database import SessionLocal
 from helpers import crud, micro
@@ -30,6 +31,35 @@ def stores(stop_event, arg):
         key = micro.login()
         store_list = micro.store_list(key=key)
     crud.add_stores(db=session, store_list=store_list)
+    micro.logout(key=key)
+
+
+def store_remains(stop_event, arg):
+    session = SessionLocal()
+    key = micro.login()
+    last_processed_item = crud.get_last_added_day_of_store_remainings(db=session)
+    today = datetime.date.today()
+    if stop_event.is_set():  # Check if stop event is set
+        micro.logout(key=key)
+        return
+    try:
+        remains_list = micro.store_remainings(key=key, store_date=today)
+    except:
+        key = micro.login()
+        remains_list = micro.store_remainings(key=key, store_date=today)
+    if last_processed_item is not None and today > last_processed_item.date:
+        for item in remains_list:
+            crud.add_store_remainings(db=session, item=item, today=today)
+    else:
+        for item in remains_list:
+            available_store_item = crud.get_store_remaining_item(db=session,
+                                                                 store_id=item['store'] if item['store'] else None,
+                                                                 nomenclature_id=item['product'] if item['product'] else None,
+                                                                 datetime=today)
+            if available_store_item:
+                continue
+            else:
+                crud.add_store_remainings(db=session, item=item, today=today)
     micro.logout(key=key)
 
 

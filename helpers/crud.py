@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 import models
@@ -30,14 +32,18 @@ def add_departments(db: Session, department_list):
             db.add(query)
             db.commit()
         except IntegrityError as e:
-            db.rollback() 
+            db.rollback()
 
 
 def add_stores(db: Session, store_list):
+    store_list = store_list['corporateItemDtoes']['corporateItemDto']
+    print("Length of stores: ", len(store_list))
+    i = 0
     for store in store_list:
+        i += 1
         id = store['id'] if 'id' in store else None
         department_id = store['parentId'] if 'parentId' in store else None
-        code = store['code'] if 'code' in store and store['code'] else None
+        code = store['code'] if 'code' in store and store['code'] is not None else None
         name = store['name'] if 'name' in store else None
         type = store['type'] if 'type' in store else None
 
@@ -50,8 +56,32 @@ def add_stores(db: Session, store_list):
         try:
             db.add(query)
             db.commit()
+            print(f"Was inserted {i}-store:  {name}")
         except IntegrityError as e:
+            print(f"Was occured error:  {e}")
             db.rollback()  # Rollback the transaction
+
+
+def add_store_remainings(db: Session, item, today):
+    store_id = item['store'] if 'store' in item else None
+    product_id = item['product'] if 'product' in item else None
+    datetime = today
+    amount = item['amount'] if 'amount' in item else None
+    sum = item['name'] if 'name' in item else None
+
+    query = models.StoreRemains(store_id=store_id,
+                                nomenclature_id=product_id,
+                                datetime=datetime,
+                                amount=amount,
+                                sum=sum
+                                )
+    try:
+        db.add(query)
+        db.commit()
+        print(f"Was inserted item:  {product_id} to {store_id}")
+    except IntegrityError as e:
+        print(f"Was occured error:  {e}")
+        db.rollback()  # Rollback the transaction
 
 
 def add_categories(db: Session, category_list):
@@ -63,7 +93,7 @@ def add_categories(db: Session, category_list):
             db.add(query)
             db.commit()
         except IntegrityError as e:
-            db.rollback() 
+            db.rollback()
 
 
 def add_groups(db: Session, group_list):
@@ -86,46 +116,6 @@ def add_groups(db: Session, group_list):
             db.commit()
         except IntegrityError as e:
             db.rollback()
-
-
-# def add_tools(db:Session, lst, new_dict):
-#     for i in lst:
-#         try:
-#             id = i.find('id')
-#             id = id.text if id is not None else None
-#             parent_id = i.find('parentId')
-#             parent_id = parent_id.text if parent_id is not None else None
-#             num = i.find('num')
-#             num = num.text if num is not None else None
-#             code = i.find('code')
-#             code = code.text if code is not None else None
-#             name = i.find('name')
-#             name = name.text if name is not None else None
-#             product_type = i.find('productType')
-#             product_type = product_type.text if product_type is not None else None
-#             cooking_type_place = i.find('cookingPlaceType')
-#             cooking_type_place = cooking_type_place.text if cooking_type_place is not None else None
-#             main_unit = i.find('mainUnit')
-#             main_unit = main_unit.text if main_unit is not None else None
-#             category = i.find('productCategory')
-#             category = new_dict[category.text] if category is not None else None
-#             query = models.Nomenclatures(id= id,
-#                                          parent_id=parent_id,
-#                                          name=name,
-#                                          num=num,
-#                                          code=code,
-#                                          product_type=product_type,
-#                                          cooking_place_type=cooking_type_place,
-#                                          main_unit=main_unit,
-#                                          category_id=category)
-#             db.add(query)
-#             try:
-#                 db.commit()
-#             except IntegrityError as e:
-#                 db.rollback()  # Rollback the transaction
-#         except Exception as e:
-#             pass
-#     return True
 
 
 def add_nomenclatures(db: Session, nomenclature_list):
@@ -296,12 +286,17 @@ def add_shift_payments(db: Session, payment):
     paymentcard_num = payment['CardNumber'] if payment['CardNumber'] else None
     bonuscard_num = payment['Bonus.CardNumber'] if payment['Bonus.CardNumber'] else None
     orderdiscount_type = payment['OrderDiscount.Type'] if payment['OrderDiscount.Type'] else None
-    orderdiscount_type_id = payment['OrderDiscount.Type.IDs'] if payment['OrderDiscount.Type.IDs'] else None
+    orderdiscount_type_id = [uuid.UUID(item) for item in list(str(payment['OrderDiscount.Type.IDs']).split(", "))] if \
+        payment['OrderDiscount.Type.IDs'] else None
     orderincrease_type = payment['OrderIncrease.Type'] if payment['OrderIncrease.Type'] else None
-    orderincrease_type_id = payment['OrderIncrease.Type.IDs'] if payment['OrderIncrease.Type.IDs'] else None
+    orderincrease_type_id = [uuid.UUID(item) for item in list(str(payment['OrderIncrease.Type.IDs']).split(", "))] if \
+        payment['OrderIncrease.Type.IDs'] else None
+    print(orderdiscount_type_id)
+    print(orderincrease_type_id)
     itemsalediscount_name = payment['ItemSaleEventDiscountType'] if payment['ItemSaleEventDiscountType'] else None
     fiscalcheque_num = payment['FiscalChequeNumber'] if payment['FiscalChequeNumber'] else None
-    discountdish_num = payment['ItemSaleEventDiscountType.DiscountAmount'] if payment['ItemSaleEventDiscountType.DiscountAmount'] else None
+    discountdish_num = payment['ItemSaleEventDiscountType.DiscountAmount'] if payment[
+        'ItemSaleEventDiscountType.DiscountAmount'] else None
     discount_percent = payment['DiscountPercent'] if payment['DiscountPercent'] else None
     discount_sum = payment['DiscountSum'] if payment['DiscountSum'] else None
     increase_percent = payment['IncreasePercent'] if payment['IncreasePercent'] else None
@@ -432,10 +427,23 @@ def get_payment_item(db: Session, shift_id, payment_id, nomenclature_id):
     return payment_item
 
 
+def get_store_remaining_item(db: Session, store_id, nomenclature_id, datetime):
+    remaining_item = db.query(models.StoreRemains).filter(and_(models.StoreRemains.store_id == store_id,
+                                                               models.StoreRemains.nomenclature_id == nomenclature_id,
+                                                               models.StoreRemains.datetime == datetime)
+                                                          ).first()
+    return remaining_item
+
+
 def get_last_added_payment(db: Session):
     last_payment = db.query(models.ShiftPayments).order_by(models.ShiftPayments.last_update.desc()).first()
     # last_added_shift = last_payment.shift_id
     return last_payment
+
+
+def get_last_added_day_of_store_remainings(db: Session):
+    last_item = db.query(models.StoreRemains).order_by(models.StoreRemains.last_update.desc()).first()
+    return last_item
 
 
 def update_department(db: Session, id):

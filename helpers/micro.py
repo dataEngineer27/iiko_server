@@ -19,7 +19,7 @@ def login():
 
 def logout(key):
     data = requests.get(f"{BASE_URL}/resto/api/logout?key={key}")
-    # print(data.text)
+    print(data.text)
 
 
 def department_list(key):
@@ -35,6 +35,12 @@ def store_list(key):
     data_xml = res.text
     data_dict = xmltodict.parse(data_xml)
     return data_dict
+
+
+def store_remainings(key, store_date):
+    url = f"{BASE_URL}/resto/api/v2/reports/balance/stores?key={key}&timestamp={store_date}T05:00:00"
+    res = requests.get(url=url)
+    return res.json()
 
 
 def category_list(key):
@@ -131,7 +137,7 @@ def shift_payments(key, session_id):
         "filters": {
             "SessionID": {
                 "filterType": "IncludeValues",
-                "values": [f"{session_id}"]
+                "values": ['629ca49d-52dd-4167-948f-6b16f96455dc']
             }
         }
     }
