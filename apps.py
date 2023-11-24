@@ -172,6 +172,7 @@ def payments(stop_event, arg):
             except:
                 key = micro.login()
                 shift_payments = micro.shift_payments(key=key, session_id=shift.id)
+
             if last_processed_payment is not None and shift.id == last_processed_payment.shift_id:
                 for payment in shift_payments['data']:
                     payment_id = payment['PaymentTransaction.Id'] if payment['PaymentTransaction.Id'] else None
