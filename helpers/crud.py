@@ -97,7 +97,9 @@ def add_categories(db: Session, category_list):
 
 
 def add_groups(db: Session, group_list):
+    i = 0
     for group in group_list:
+        i += 1
         if group['visibilityFilter'] is not None:
             department_list = group['visibilityFilter']['departments']
         else:
@@ -114,8 +116,11 @@ def add_groups(db: Session, group_list):
         try:
             db.add(query)
             db.commit()
+            print(f"Was added group-{i}: ", group['name'])
         except IntegrityError as e:
+            print(f"Error of group-{i}: ", e)
             db.rollback()
+    print("Length of groups: ", len(group_list))
 
 
 def add_nomenclatures(db: Session, nomenclature_list):
@@ -150,7 +155,9 @@ def add_nomenclatures(db: Session, nomenclature_list):
         try:
             db.add(query)
             db.commit()
+            print("Was added product: ", name)
         except IntegrityError as e:
+            print("Error: ", e)
             db.rollback()  # Rollback the transaction
 
 
