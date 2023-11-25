@@ -1,7 +1,8 @@
+import json
 import requests
 import os
-
 import xmltodict
+
 from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
 
@@ -22,34 +23,42 @@ def logout(key):
     print(data.text)
 
 
+# def department_list(key):
+#     departments = requests.get(f"{BASE_URL}/resto/api/corporation/departments?key={key}&includeDeleted=true")
+#     root = ET.fromstring(departments.content)
+#     corporate_item_dtos = root.findall('corporateItemDto')
+#     return corporate_item_dtos
+
+
 def department_list(key):
-    departments = requests.get(f"{BASE_URL}/resto/api/corporation/departments?key={key}")
-    root = ET.fromstring(departments.content)
-    corporate_item_dtos = root.findall('corporateItemDto')
-    return corporate_item_dtos
-
-
-def store_list(key):
-    url = f"{BASE_URL}/resto/api/corporation/stores?key={key}"
+    url = f"{BASE_URL}/resto/api/corporation/departments?key={key}&includeDeleted=true"
     res = requests.get(url=url)
     data_xml = res.text
     data_dict = xmltodict.parse(data_xml)
     return data_dict
 
 
-def store_remainings(key, store_date):
-    url = f"{BASE_URL}/resto/api/v2/reports/balance/stores?key={key}&timestamp={store_date}T05:00:00"
+def store_list(key):
+    url = f"{BASE_URL}/resto/api/corporation/stores?key={key}&includeDeleted=true"
+    res = requests.get(url=url)
+    data_xml = res.text
+    data_dict = xmltodict.parse(data_xml)
+    return data_dict
+
+
+def store_remainings(key, date, time):
+    url = f"{BASE_URL}/resto/api/v2/reports/balance/stores?key={key}&timestamp={date}T15:50:00"
     res = requests.get(url=url)
     return res.json()
 
 
 def category_list(key):
-    categories = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/category/list?key={key}")
+    categories = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/category/list?key={key}&includeDeleted=true")
     return categories.json()
 
 
 def nomenclature_groups(key):
-    groups = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/group/list?key={key}")
+    groups = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/group/list?key={key}&includeDeleted=true")
     return groups.json()
 
 
@@ -60,7 +69,7 @@ def nomenclature_groups(key):
 #     return product_item_dtos
 
 def nomenclature_list(key):
-    nomenclatures = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/list?includeDeleted=true&key={key}")
+    nomenclatures = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/list?key={key}&includeDeleted=true")
     return nomenclatures.json()
 
 

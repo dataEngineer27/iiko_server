@@ -9,35 +9,34 @@ from helpers.database import session
 
 
 def add_departments(db: Session, department_list):
+    department_list = department_list['corporateItemDtoes']['corporateItemDto']
+    i = 0
     for department in department_list:
-        id = department.find('id')
-        id = id.text if id is not None else None
-        parent_id = department.find('parentId')
-        parent_id = parent_id.text if parent_id is not None else None
-        code = department.find('code')
-        code = code.text if code is not None else None
-        name = department.find('name')
-        name = name.text if name is not None else None
-        type_n = department.find('type')
-        type_n = type_n.text if type_n is not None else None
-        tax_payer_id = department.find('taxpayerIdNumber')
-        tax_payer_id = tax_payer_id.text if tax_payer_id is not None else None
+        i += 1
+        id = department['id'] if 'id' in department else None
+        parent_id = department['parentId'] if 'parentId' in department else None
+        code = department['code'] if 'code' in department else None
+        name = department['name'] if 'name' in department else None
+        object_type = department['type'] if 'type' in department else None
+        tax_payer_id = department['taxpayerIdNumber'] if 'taxpayerIdNumber' in department else None
         query = models.Departments(id=id,
                                    parent_id=parent_id,
                                    code=code,
                                    name=name,
-                                   type=type_n,
+                                   type=object_type,
                                    tax_payer_id=tax_payer_id)
         try:
             db.add(query)
             db.commit()
+            print(f"Was inserted {i}-department:  {name}")
         except IntegrityError as e:
+            print(f"Was occured error on {i}-department")
             db.rollback()
+    print("Length of departments: ", len(department_list))
 
 
 def add_stores(db: Session, store_list):
     store_list = store_list['corporateItemDtoes']['corporateItemDto']
-    print("Length of stores: ", len(store_list))
     i = 0
     for store in store_list:
         i += 1
@@ -58,20 +57,20 @@ def add_stores(db: Session, store_list):
             db.commit()
             print(f"Was inserted {i}-store:  {name}")
         except IntegrityError as e:
-            print(f"Was occured error:  {e}")
+            print(f"Was occured error on {i}-store")
             db.rollback()  # Rollback the transaction
+    print("Length of stores: ", len(store_list))
 
 
-def add_store_remainings(db: Session, item, today):
+def add_store_remainings(db: Session, item, current_datetime):
     store_id = item['store'] if 'store' in item else None
     product_id = item['product'] if 'product' in item else None
-    datetime = today
     amount = item['amount'] if 'amount' in item else None
     sum = item['name'] if 'name' in item else None
 
     query = models.StoreRemains(store_id=store_id,
                                 nomenclature_id=product_id,
-                                datetime=datetime,
+                                datetime=current_datetime,
                                 amount=amount,
                                 sum=sum
                                 )
@@ -80,7 +79,7 @@ def add_store_remainings(db: Session, item, today):
         db.commit()
         print(f"Was inserted item:  {product_id} to {store_id}")
     except IntegrityError as e:
-        print(f"Was occured error:  {e}")
+        print(f"Was occured error")
         db.rollback()  # Rollback the transaction
 
 
@@ -92,6 +91,7 @@ def add_categories(db: Session, category_list):
         try:
             db.add(query)
             db.commit()
+            print(f"Was added category: ", category['name'])
         except IntegrityError as e:
             db.rollback()
 
@@ -124,7 +124,9 @@ def add_groups(db: Session, group_list):
 
 
 def add_nomenclatures(db: Session, nomenclature_list):
+    i = 0
     for nomenclature in nomenclature_list:
+        i += 1
         id = nomenclature['id'] if 'id' in nomenclature else None
         group_id = nomenclature['parent'] if 'parent' in nomenclature else None
         category_id = nomenclature['category'] if 'category' in nomenclature else None
@@ -155,10 +157,12 @@ def add_nomenclatures(db: Session, nomenclature_list):
         try:
             db.add(query)
             db.commit()
-            print("Was added product: ", name)
+            print(f"Was added {i}-product: ", name)
         except IntegrityError as e:
-            print("Error: ", e)
+            print(f"Error of {i}-product: ", e)
             db.rollback()  # Rollback the transaction
+
+    print(f"Amount of products: {i}")
 
 
 def add_roles(db: Session, role_list):
@@ -266,49 +270,46 @@ def add_shifts(db: Session, shift_list, department_id):
 
 
 def add_shift_payments(db: Session, payment):
-    order_id = payment['UniqOrderId.Id'] if payment['UniqOrderId.Id'] else None
-    order_num = payment['OrderNum'] if payment['OrderNum'] else None
-    payment_id = payment['PaymentTransaction.Id'] if payment['PaymentTransaction.Id'] else None
-    created_at = payment['CloseTime'] if payment['CloseTime'] else None
-    nomenclature_id = payment['DishId'] if payment['DishId'] else None
-    nomenclature_name = payment['DishName'] if payment['DishName'] else None
-    shift_id = payment['SessionID'] if payment['SessionID'] else None
-    shift_num = payment['SessionNum'] if payment['SessionNum'] else None
-    cashier_id = payment['Cashier.Id'] if payment['Cashier.Id'] else None
-    soldwithdish_id = payment['SoldWithDish.Id'] if payment['SoldWithDish.Id'] else None
-    soldwithitem_id = payment['SoldWithItem.Id'] if payment['SoldWithItem.Id'] else None
-    department_id = payment['Department.Id'] if payment['Department.Id'] else None
-    ordertype_id = payment['OrderType.Id'] if payment['OrderType.Id'] else None
-    ordertype = payment['OrderType'] if payment['OrderType'] else None
-    paymenttype_id = payment['PayTypes.GUID'] if payment['PayTypes.GUID'] else None
-    paymenttype = payment['PayTypes'] if payment['PayTypes'] else None
-    paymenttype_group = payment['PayTypes.Group'] if payment['PayTypes.Group'] else None
-    measure_unit = payment['DishMeasureUnit'] if payment['DishMeasureUnit'] else None
-    nomenclature_amount = payment['DishAmountInt'] if payment['DishAmountInt'] else None
-    nomenclature_sum = payment['DishSumInt'] if payment['DishSumInt'] else None
-    is_delivery = payment['Delivery.IsDelivery'] if payment['Delivery.IsDelivery'] else None
-    guest_num = payment['GuestNum'] if payment['GuestNum'] else None
-    guestcard_num = payment['OrderDiscount.GuestCard'] if payment['OrderDiscount.GuestCard'] else None
-    guestcard_owner = payment['CardOwner'] if payment['CardOwner'] else None
-    paymentcard_num = payment['CardNumber'] if payment['CardNumber'] else None
-    bonuscard_num = payment['Bonus.CardNumber'] if payment['Bonus.CardNumber'] else None
-    orderdiscount_type = payment['OrderDiscount.Type'] if payment['OrderDiscount.Type'] else None
-    orderdiscount_type_id = [uuid.UUID(item) for item in list(str(payment['OrderDiscount.Type.IDs']).split(", "))] if \
-        payment['OrderDiscount.Type.IDs'] else None
-    orderincrease_type = payment['OrderIncrease.Type'] if payment['OrderIncrease.Type'] else None
-    orderincrease_type_id = [uuid.UUID(item) for item in list(str(payment['OrderIncrease.Type.IDs']).split(", "))] if \
-        payment['OrderIncrease.Type.IDs'] else None
+    order_id = payment['UniqOrderId.Id'] if 'UniqOrderId.Id' in payment and payment['UniqOrderId.Id'] is not None else None
+    order_num = payment['OrderNum'] if 'OrderNum' in payment and payment['OrderNum'] is not None else None
+    payment_id = payment['PaymentTransaction.Id'] if 'PaymentTransaction.Id' in payment and payment['PaymentTransaction.Id'] is not None else None
+    created_at = payment['CloseTime'] if 'CloseTime' in payment and payment['CloseTime'] is not None else None
+    nomenclature_id = payment['DishId'] if 'DishId' in payment and payment['DishId'] is not None else None
+    nomenclature_name = payment['DishName'] if 'DishName' in payment and payment['DishName'] is not None else None
+    shift_id = payment['SessionID'] if 'SessionID' in payment and payment['SessionID'] is not None else None
+    shift_num = payment['SessionNum'] if 'SessionNum' in payment and payment['SessionNum'] is not None else None
+    cashier_id = payment['Cashier.Id'] if 'Cashier.Id' in payment and payment['Cashier.Id'] is not None else None
+    soldwithdish_id = payment['SoldWithDish.Id'] if 'SoldWithDish.Id' in payment and payment['SoldWithDish.Id'] is not None else None
+    soldwithitem_id = payment['SoldWithItem.Id'] if 'SoldWithItem.Id' in payment and payment['SoldWithItem.Id'] is not None else None
+    department_id = payment['Department.Id'] if 'Department.Id' in payment and payment['Department.Id'] is not None else None
+    ordertype_id = payment['OrderType.Id'] if 'OrderType.Id' in payment and payment['OrderType.Id'] is not None else None
+    ordertype = payment['OrderType'] if 'OrderType' in payment and payment['OrderType'] is not None else None
+    paymenttype_id = payment['PayTypes.GUID'] if 'PayTypes.GUID' in payment and payment['PayTypes.GUID'] is not None else None
+    paymenttype = payment['PayTypes'] if 'PayTypes' in payment and payment['PayTypes'] is not None else None
+    paymenttype_group = payment['PayTypes.Group'] if 'PayTypes.Group' in payment and payment['PayTypes.Group'] is not None else None
+    measure_unit = payment['DishMeasureUnit'] if 'DishMeasureUnit' in payment and payment['DishMeasureUnit'] is not None else None
+    nomenclature_amount = payment['DishAmountInt'] if 'DishAmountInt' in payment and payment['DishAmountInt'] is not None else None
+    nomenclature_sum = payment['DishSumInt'] if 'DishSumInt' in payment and payment['DishSumInt'] is not None else None
+    is_delivery = payment['Delivery.IsDelivery'] if 'Delivery.IsDelivery' in payment and payment['Delivery.IsDelivery'] is not None else None
+    guest_num = payment['GuestNum'] if 'GuestNum' in payment and payment['GuestNum'] is not None else None
+    guestcard_num = payment['OrderDiscount.GuestCard'] if 'OrderDiscount.GuestCard' in payment and payment['OrderDiscount.GuestCard'] is not None else None
+    guestcard_owner = payment['CardOwner'] if 'CardOwner' in payment and payment['CardOwner'] is not None else None
+    paymentcard_num = payment['CardNumber'] if 'CardNumber' in payment and payment['CardNumber'] is not None else None
+    bonuscard_num = payment['Bonus.CardNumber'] if 'Bonus.CardNumber' in payment and payment['Bonus.CardNumber'] is not None else None
+    orderdiscount_type = payment['OrderDiscount.Type'] if 'OrderDiscount.Type' in payment and payment['OrderDiscount.Type'] is not None else None
+    orderdiscount_type_id = [uuid.UUID(item) for item in payment['OrderDiscount.Type.IDs'].split(", ")] if 'OrderDiscount.Type.IDs' in payment and payment['OrderDiscount.Type.IDs'] is not None else None
+    orderincrease_type = payment['OrderIncrease.Type'] if 'OrderIncrease.Type' in payment and payment['OrderIncrease.Type'] is not None else None
+    orderincrease_type_id = [uuid.UUID(item) for item in payment['OrderIncrease.Type.IDs'].split(", ")] if 'OrderIncrease.Type.IDs' in payment and payment['OrderIncrease.Type.IDs'] is not None else None
     print(orderdiscount_type_id)
     print(orderincrease_type_id)
-    itemsalediscount_name = payment['ItemSaleEventDiscountType'] if payment['ItemSaleEventDiscountType'] else None
-    fiscalcheque_num = payment['FiscalChequeNumber'] if payment['FiscalChequeNumber'] else None
-    discountdish_num = payment['ItemSaleEventDiscountType.DiscountAmount'] if payment[
-        'ItemSaleEventDiscountType.DiscountAmount'] else None
-    discount_percent = payment['DiscountPercent'] if payment['DiscountPercent'] else None
-    discount_sum = payment['DiscountSum'] if payment['DiscountSum'] else None
-    increase_percent = payment['IncreasePercent'] if payment['IncreasePercent'] else None
-    increase_sum = payment['IncreaseSum'] if payment['IncreaseSum'] else None
-    full_sum = payment['fullSum'] if payment['fullSum'] else None
+    itemsalediscount_name = payment['ItemSaleEventDiscountType'] if 'ItemSaleEventDiscountType' in payment and payment['ItemSaleEventDiscountType'] is not None else None
+    fiscalcheque_num = payment['FiscalChequeNumber'] if 'FiscalChequeNumber' in payment and payment['FiscalChequeNumber'] is not None else None
+    discountdish_num = payment['ItemSaleEventDiscountType.DiscountAmount'] if 'ItemSaleEventDiscountType.DiscountAmount' in payment and payment['ItemSaleEventDiscountType.DiscountAmount'] is not None else None
+    discount_percent = payment['DiscountPercent'] if 'DiscountPercent' in payment and payment['DiscountPercent'] is not None else None
+    discount_sum = payment['DiscountSum'] if 'DiscountSum' in payment and payment['DiscountSum'] is not None else None
+    increase_percent = payment['IncreasePercent'] if 'IncreasePercent' in payment and payment['IncreasePercent'] is not None else None
+    increase_sum = payment['IncreaseSum'] if 'IncreaseSum' in payment and payment['IncreaseSum'] is not None else None
+    full_sum = payment['fullSum'] if 'fullSum' in payment and payment['fullSum'] is not None else None
     query = models.ShiftPayments(order_id=order_id,
                                  order_num=order_num,
                                  payment_id=payment_id,
@@ -448,7 +449,7 @@ def get_last_added_payment(db: Session):
     return last_payment
 
 
-def get_last_added_day_of_store_remainings(db: Session):
+def get_last_added_store_remaining(db: Session):
     last_item = db.query(models.StoreRemains).order_by(models.StoreRemains.last_update.desc()).first()
     return last_item
 

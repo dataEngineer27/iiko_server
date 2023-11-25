@@ -37,29 +37,44 @@ def stores(stop_event, arg):
 def store_remains(stop_event, arg):
     session = SessionLocal()
     key = micro.login()
-    last_processed_item = crud.get_last_added_day_of_store_remainings(db=session)
-    today = datetime.date.today()
+    last_processed_item = crud.get_last_added_store_remaining(db=session)
+    current_datetime = datetime.datetime.now()
+    current_date = datetime.datetime.now().date()
+    current_time = datetime.datetime.now().time().strftime("%H:%M:%S")
     if stop_event.is_set():  # Check if stop event is set
         micro.logout(key=key)
         return
     try:
-        remains_list = micro.store_remainings(key=key, store_date=today)
+        remains_list = micro.store_remainings(key=key, date=current_date, time=current_time)
     except:
         key = micro.login()
-        remains_list = micro.store_remainings(key=key, store_date=today)
-    if last_processed_item is not None and today > last_processed_item.date:
-        for item in remains_list:
-            crud.add_store_remainings(db=session, item=item, today=today)
+        remains_list = micro.store_remainings(key=key, date=current_date, time=current_time)
+    i = 0
+    if last_processed_item is not None:
+        if current_date > last_processed_item.date:
+            for item in remains_list:
+                i += 1
+                crud.add_store_remainings(db=session, item=item, current_datetime=current_datetime)
+                print(f"Was inserted {i}-item")
+        else:
+            for item in remains_list:
+                i += 1
+                available_store_item = crud.get_store_remaining_item(db=session,
+                                                                     store_id=item['store'] if item['store'] else None,
+                                                                     nomenclature_id=item['product'] if item['product'] else None,
+                                                                     datetime=current_datetime)
+                if available_store_item:
+                    print(f"Was skipped existing {i}-item")
+                    continue
+                else:
+                    crud.add_store_remainings(db=session, item=item, current_datetime=current_datetime)
+                    print(f"Was inserted {i}-product")
     else:
         for item in remains_list:
-            available_store_item = crud.get_store_remaining_item(db=session,
-                                                                 store_id=item['store'] if item['store'] else None,
-                                                                 nomenclature_id=item['product'] if item['product'] else None,
-                                                                 datetime=today)
-            if available_store_item:
-                continue
-            else:
-                crud.add_store_remainings(db=session, item=item, today=today)
+            i += 1
+            crud.add_store_remainings(db=session, item=item, current_datetime=current_datetime)
+            print(f"Was inserted {i}-product")
+
     micro.logout(key=key)
 
 
@@ -203,17 +218,21 @@ def payments(stop_event, arg):
                 key = micro.login()
                 shift_payments = micro.shift_payments(key=key, session_id=shift.id)
 
-            if last_processed_payment is not None and shift.id == last_processed_payment.shift_id:
-                for payment in shift_payments['data']:
-                    payment_id = payment['PaymentTransaction.Id'] if payment['PaymentTransaction.Id'] else None
-                    nomenclature_id = payment['DishId'] if payment['DishId'] else None
-                    available_payment_item = crud.get_payment_item(db=session,
-                                                                   shift_id=shift.id,
-                                                                   payment_id=payment_id,
-                                                                   nomenclature_id=nomenclature_id)
-                    if available_payment_item:
-                        continue
-                    else:
+            if last_processed_payment is not None:
+                if shift.id == last_processed_payment.shift_id:
+                    for payment in shift_payments['data']:
+                        payment_id = payment['PaymentTransaction.Id'] if payment['PaymentTransaction.Id'] else None
+                        nomenclature_id = payment['DishId'] if payment['DishId'] else None
+                        available_payment_item = crud.get_payment_item(db=session,
+                                                                       shift_id=shift.id,
+                                                                       payment_id=payment_id,
+                                                                       nomenclature_id=nomenclature_id)
+                        if available_payment_item:
+                            continue
+                        else:
+                            crud.add_shift_payments(db=session, payment=payment)
+                else:
+                    for payment in shift_payments['data']:
                         crud.add_shift_payments(db=session, payment=payment)
             else:
                 for payment in shift_payments['data']:
