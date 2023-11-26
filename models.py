@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Float, DECIMAL, DateTime, Date, Boolean, BIGINT, DOUBLE_PRECISION
+from sqlalchemy import Column, Integer, String, ForeignKey, Float, DECIMAL, DateTime, Date, Boolean, BIGINT, \
+    DOUBLE_PRECISION
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -49,9 +50,9 @@ class Nomenclatures(Base):
     name = Column(String)
     num = Column(String, nullable=True)
     code = Column(BIGINT, nullable=True)
-    main_unit = Column(UUID, nullable=True)
+    main_unit = Column(UUID(as_uuid=True), ForeignKey('reference_units.id'), nullable=True)
     price = Column(Float, nullable=True)
-    place_type = Column(UUID(as_uuid=True), nullable=True)
+    place_type = Column(UUID(as_uuid=True), ForeignKey('reference_units.id'), nullable=True)
     included_in_menu = Column(Boolean, nullable=True)
     type = Column(String, nullable=True)
     unit_weight = Column(Float, nullable=True)
@@ -63,8 +64,11 @@ class Nomenclatures(Base):
     payments = relationship('ShiftPayments', back_populates='nomenclatures')
     remains = relationship('StoreRemains', back_populates='nomenclatures')
     incomings = relationship('StoreIncomings', back_populates='nomenclatures')
-    # units = relationship('ReferenceUnits', back_populates='nomenclatures')
     sendings = relationship('StoreSendings', back_populates='nomenclatures')
+    main_unit_fk = relationship('ReferenceUnits', backref='nomenclatures_mainunit', uselist=False,
+                                foreign_keys="Nomenclatures.main_unit")
+    place_type_fk = relationship('ReferenceUnits', backref='nomenclatures_placetype', uselist=False,
+                                 foreign_keys="Nomenclatures.place_type")
 
 
 class Departments(Base):
@@ -164,11 +168,10 @@ class ReferenceUnits(Base):
     code = Column(String, nullable=True)
     name = Column(String, nullable=True)
     incomings = relationship('StoreIncomings', back_populates='units')
-    # nomenclatures = relationship('Nomenclatures', back_populates='units')
+    # nomenclatures_mainunit = relationship('Nomenclatures', back_populates='main_unit_fk')
+    # nomenclatures_placetype = relationship('Nomenclatures', back_populates='place_type_fk')
     # payments_ordertype = relationship('ShiftPayments', back_populates='ordertype_fk')
     # payments_paymenttype = relationship('ShiftPayments', back_populates='paymenttype_fk')
-    # payments_orderdiscount_type = relationship('ShiftPayments', back_populates='orderdiscount_type_fk')
-    # payments_orderincrease_type = relationship('ShiftPayments', back_populates='orderincrease_type_fk')
 
 
 class DepartmentRevenue(Base):
@@ -279,9 +282,9 @@ class ShiftPayments(Base):
     paymentcard_num = Column(String, nullable=True)
     bonuscard_num = Column(String, nullable=True)
     orderdiscount_type = Column(String, nullable=True)
-    orderdiscount_type_id = Column(ARRAY(UUID(as_uuid=True)), ForeignKey('reference_units.id'), nullable=True)
+    orderdiscount_type_id = Column(ARRAY(UUID(as_uuid=True)), nullable=True)
     orderincrease_type = Column(String, nullable=True)
-    orderincrease_type_id = Column(ARRAY(UUID(as_uuid=True)), ForeignKey('reference_units.id'), nullable=True)
+    orderincrease_type_id = Column(ARRAY(UUID(as_uuid=True)), nullable=True)
     itemsalediscount_name = Column(String, nullable=True)
     fiscalcheque_num = Column(Integer, nullable=True)
     discountdish_num = Column(DECIMAL, nullable=True)
@@ -295,10 +298,10 @@ class ShiftPayments(Base):
     employee = relationship('Employees', back_populates='payments')
     department = relationship('Departments', back_populates='payments')
     nomenclatures = relationship('Nomenclatures', back_populates='payments')
-    ordertype_fk = relationship('ReferenceUnits', backref='payments_ordertype', uselist=False, foreign_keys="ShiftPayments.ordertype_id")
-    paymenttype_fk = relationship('ReferenceUnits', backref='payments_paymenttype', uselist=False, foreign_keys="ShiftPayments.paymenttype_id")
-    orderdiscount_type_fk = relationship('ReferenceUnits', backref='payments_orderdiscount_type', uselist=False, foreign_keys="ShiftPayments.orderdiscount_type_id")
-    orderincrease_type_fk = relationship('ReferenceUnits', backref='payments_orderincrease_type', uselist=False, foreign_keys="ShiftPayments.orderincrease_type_id")
+    ordertype_fk = relationship('ReferenceUnits', backref='payments_ordertype', uselist=False,
+                                foreign_keys="ShiftPayments.ordertype_id")
+    paymenttype_fk = relationship('ReferenceUnits', backref='payments_paymenttype', uselist=False,
+                                  foreign_keys="ShiftPayments.paymenttype_id")
 
 
 class ProductExpense(Base):

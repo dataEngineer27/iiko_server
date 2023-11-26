@@ -1,6 +1,6 @@
 import uuid
 
-from sqlalchemy import and_
+from sqlalchemy import and_, null
 from sqlalchemy.orm import Session
 import models
 from sqlalchemy.exc import IntegrityError
@@ -165,6 +165,32 @@ def add_nomenclatures(db: Session, nomenclature_list):
     print(f"Amount of products: {i}")
 
 
+def add_units(db: Session, unit_list):
+    global type
+    i = 0
+    for unit in unit_list:
+        i += 1
+        id = unit['id'] if 'id' in unit else None
+        type = unit['rootType'] if 'rootType' in unit else None
+        deleted = unit['deleted'] if 'deleted' in unit else None
+        code = unit['code'] if 'code' in unit else None
+        name = unit['name'] if 'name' in unit else None
+        query = models.ReferenceUnits(id=id,
+                                      type=type,
+                                      deleted=deleted,
+                                      code=code,
+                                      name=name
+                                      )
+        try:
+            db.add(query)
+            db.commit()
+            print(f"Was added {i}-unit: ", name)
+        except IntegrityError as e:
+            print(f"Error of {i}-unit: ", e)
+            db.rollback()  # Rollback the transaction
+    print(f"Added {i} units for this unit_type: {type}")
+
+
 def add_roles(db: Session, role_list):
     for role in role_list:
         id = role.find('id')
@@ -270,46 +296,67 @@ def add_shifts(db: Session, shift_list, department_id):
 
 
 def add_shift_payments(db: Session, payment):
-    order_id = payment['UniqOrderId.Id'] if 'UniqOrderId.Id' in payment and payment['UniqOrderId.Id'] is not None else None
-    order_num = payment['OrderNum'] if 'OrderNum' in payment and payment['OrderNum'] is not None else None
-    payment_id = payment['PaymentTransaction.Id'] if 'PaymentTransaction.Id' in payment and payment['PaymentTransaction.Id'] is not None else None
-    created_at = payment['CloseTime'] if 'CloseTime' in payment and payment['CloseTime'] is not None else None
-    nomenclature_id = payment['DishId'] if 'DishId' in payment and payment['DishId'] is not None else None
-    nomenclature_name = payment['DishName'] if 'DishName' in payment and payment['DishName'] is not None else None
-    shift_id = payment['SessionID'] if 'SessionID' in payment and payment['SessionID'] is not None else None
-    shift_num = payment['SessionNum'] if 'SessionNum' in payment and payment['SessionNum'] is not None else None
-    cashier_id = payment['Cashier.Id'] if 'Cashier.Id' in payment and payment['Cashier.Id'] is not None else None
-    soldwithdish_id = payment['SoldWithDish.Id'] if 'SoldWithDish.Id' in payment and payment['SoldWithDish.Id'] is not None else None
-    soldwithitem_id = payment['SoldWithItem.Id'] if 'SoldWithItem.Id' in payment and payment['SoldWithItem.Id'] is not None else None
-    department_id = payment['Department.Id'] if 'Department.Id' in payment and payment['Department.Id'] is not None else None
-    ordertype_id = payment['OrderType.Id'] if 'OrderType.Id' in payment and payment['OrderType.Id'] is not None else None
-    ordertype = payment['OrderType'] if 'OrderType' in payment and payment['OrderType'] is not None else None
-    paymenttype_id = payment['PayTypes.GUID'] if 'PayTypes.GUID' in payment and payment['PayTypes.GUID'] is not None else None
-    paymenttype = payment['PayTypes'] if 'PayTypes' in payment and payment['PayTypes'] is not None else None
-    paymenttype_group = payment['PayTypes.Group'] if 'PayTypes.Group' in payment and payment['PayTypes.Group'] is not None else None
-    measure_unit = payment['DishMeasureUnit'] if 'DishMeasureUnit' in payment and payment['DishMeasureUnit'] is not None else None
-    nomenclature_amount = payment['DishAmountInt'] if 'DishAmountInt' in payment and payment['DishAmountInt'] is not None else None
-    nomenclature_sum = payment['DishSumInt'] if 'DishSumInt' in payment and payment['DishSumInt'] is not None else None
-    is_delivery = payment['Delivery.IsDelivery'] if 'Delivery.IsDelivery' in payment and payment['Delivery.IsDelivery'] is not None else None
-    guest_num = payment['GuestNum'] if 'GuestNum' in payment and payment['GuestNum'] is not None else None
-    guestcard_num = payment['OrderDiscount.GuestCard'] if 'OrderDiscount.GuestCard' in payment and payment['OrderDiscount.GuestCard'] is not None else None
-    guestcard_owner = payment['CardOwner'] if 'CardOwner' in payment and payment['CardOwner'] is not None else None
-    paymentcard_num = payment['CardNumber'] if 'CardNumber' in payment and payment['CardNumber'] is not None else None
-    bonuscard_num = payment['Bonus.CardNumber'] if 'Bonus.CardNumber' in payment and payment['Bonus.CardNumber'] is not None else None
-    orderdiscount_type = payment['OrderDiscount.Type'] if 'OrderDiscount.Type' in payment and payment['OrderDiscount.Type'] is not None else None
-    orderdiscount_type_id = [uuid.UUID(item) for item in payment['OrderDiscount.Type.IDs'].split(", ")] if 'OrderDiscount.Type.IDs' in payment and payment['OrderDiscount.Type.IDs'] is not None else None
-    orderincrease_type = payment['OrderIncrease.Type'] if 'OrderIncrease.Type' in payment and payment['OrderIncrease.Type'] is not None else None
-    orderincrease_type_id = [uuid.UUID(item) for item in payment['OrderIncrease.Type.IDs'].split(", ")] if 'OrderIncrease.Type.IDs' in payment and payment['OrderIncrease.Type.IDs'] is not None else None
-    print(orderdiscount_type_id)
-    print(orderincrease_type_id)
-    itemsalediscount_name = payment['ItemSaleEventDiscountType'] if 'ItemSaleEventDiscountType' in payment and payment['ItemSaleEventDiscountType'] is not None else None
-    fiscalcheque_num = payment['FiscalChequeNumber'] if 'FiscalChequeNumber' in payment and payment['FiscalChequeNumber'] is not None else None
-    discountdish_num = payment['ItemSaleEventDiscountType.DiscountAmount'] if 'ItemSaleEventDiscountType.DiscountAmount' in payment and payment['ItemSaleEventDiscountType.DiscountAmount'] is not None else None
-    discount_percent = payment['DiscountPercent'] if 'DiscountPercent' in payment and payment['DiscountPercent'] is not None else None
-    discount_sum = payment['DiscountSum'] if 'DiscountSum' in payment and payment['DiscountSum'] is not None else None
-    increase_percent = payment['IncreasePercent'] if 'IncreasePercent' in payment and payment['IncreasePercent'] is not None else None
-    increase_sum = payment['IncreaseSum'] if 'IncreaseSum' in payment and payment['IncreaseSum'] is not None else None
-    full_sum = payment['fullSum'] if 'fullSum' in payment and payment['fullSum'] is not None else None
+    order_id = payment['UniqOrderId.Id'] if 'UniqOrderId.Id' in payment and payment['UniqOrderId.Id'] else None
+    order_num = payment['OrderNum'] if 'OrderNum' in payment and payment['OrderNum'] else None
+    payment_id = payment['PaymentTransaction.Id'] if 'PaymentTransaction.Id' in payment and payment[
+        'PaymentTransaction.Id'] else None
+    created_at = payment['CloseTime'] if 'CloseTime' in payment and payment['CloseTime'] else None
+    nomenclature_id = payment['DishId'] if 'DishId' in payment and payment['DishId'] else None
+    nomenclature_name = payment['DishName'] if 'DishName' in payment and payment['DishName'] else None
+    shift_id = payment['SessionID'] if 'SessionID' in payment and payment['SessionID'] else None
+    shift_num = payment['SessionNum'] if 'SessionNum' in payment and payment['SessionNum'] else None
+    cashier_id = payment['Cashier.Id'] if 'Cashier.Id' in payment and payment['Cashier.Id'] else None
+    soldwithdish_id = payment['SoldWithDish.Id'] if 'SoldWithDish.Id' in payment and payment[
+        'SoldWithDish.Id'] else None
+    soldwithitem_id = payment['SoldWithItem.Id'] if 'SoldWithItem.Id' in payment and payment[
+        'SoldWithItem.Id'] else None
+    department_id = payment['Department.Id'] if 'Department.Id' in payment and payment['Department.Id'] else None
+    ordertype_id = payment['OrderType.Id'] if 'OrderType.Id' in payment and payment['OrderType.Id'] else None
+    ordertype = payment['OrderType'] if 'OrderType' in payment and payment['OrderType'] else None
+    paymenttype_id = payment['PayTypes.GUID'] if 'PayTypes.GUID' in payment and payment['PayTypes.GUID'] else None
+    paymenttype = payment['PayTypes'] if 'PayTypes' in payment and payment['PayTypes'] else None
+    paymenttype_group = payment['PayTypes.Group'] if 'PayTypes.Group' in payment and payment['PayTypes.Group'] else None
+    measure_unit = payment['DishMeasureUnit'] if 'DishMeasureUnit' in payment and payment['DishMeasureUnit'] else None
+    nomenclature_amount = payment['DishAmountInt'] if 'DishAmountInt' in payment and payment['DishAmountInt'] else None
+    nomenclature_sum = payment['DishSumInt'] if 'DishSumInt' in payment and payment['DishSumInt'] else None
+    is_delivery = payment['Delivery.IsDelivery'] if 'Delivery.IsDelivery' in payment and payment[
+        'Delivery.IsDelivery'] else None
+    guest_num = payment['GuestNum'] if 'GuestNum' in payment and payment['GuestNum'] else None
+    guestcard_num = payment['OrderDiscount.GuestCard'] if 'OrderDiscount.GuestCard' in payment and payment[
+        'OrderDiscount.GuestCard'] else None
+    guestcard_owner = payment['CardOwner'] if 'CardOwner' in payment and payment['CardOwner'] else None
+    paymentcard_num = payment['CardNumber'] if 'CardNumber' in payment and payment['CardNumber'] else None
+    bonuscard_num = payment['Bonus.CardNumber'] if 'Bonus.CardNumber' in payment and payment[
+        'Bonus.CardNumber'] else None
+    orderdiscount_type = payment['OrderDiscount.Type'] if 'OrderDiscount.Type' in payment and payment[
+        'OrderDiscount.Type'] else None
+    orderdiscount_type_id = [uuid.UUID(item) for item in
+                             payment['OrderDiscount.Type.IDs'].split(", ")] if 'OrderDiscount.Type.IDs' in payment and \
+                                                                               payment[
+                                                                                   'OrderDiscount.Type.IDs'] else None
+    print('OrderDiscount.Type.IDs: ', orderdiscount_type_id)
+    orderincrease_type = payment['OrderIncrease.Type'] if 'OrderIncrease.Type' in payment and payment[
+        'OrderIncrease.Type'] else None
+    orderincrease_type_id = [uuid.UUID(item) for item in
+                             payment['OrderIncrease.Type.IDs'].split(", ")] if 'OrderIncrease.Type.IDs' in payment and \
+                                                                               payment[
+                                                                                   'OrderIncrease.Type.IDs'] else None
+    print('OrderIncrease.Type.IDs: ', orderincrease_type_id)
+    itemsalediscount_name = payment['ItemSaleEventDiscountType'] if 'ItemSaleEventDiscountType' in payment and payment[
+        'ItemSaleEventDiscountType'] else None
+    fiscalcheque_num = payment['FiscalChequeNumber'] if 'FiscalChequeNumber' in payment and payment[
+        'FiscalChequeNumber'] else None
+    discountdish_num = payment[
+        'ItemSaleEventDiscountType.DiscountAmount'] if 'ItemSaleEventDiscountType.DiscountAmount' in payment and \
+                                                       payment['ItemSaleEventDiscountType.DiscountAmount'] else None
+    discount_percent = payment['DiscountPercent'] if 'DiscountPercent' in payment and payment[
+        'DiscountPercent'] else None
+    discount_sum = payment['DiscountSum'] if 'DiscountSum' in payment and payment['DiscountSum'] else None
+    increase_percent = payment['IncreasePercent'] if 'IncreasePercent' in payment and payment[
+        'IncreasePercent'] else None
+    increase_sum = payment['IncreaseSum'] if 'IncreaseSum' in payment and payment['IncreaseSum'] else None
+    full_sum = payment['fullSum'] if 'fullSum' in payment and payment['fullSum'] else None
+
     query = models.ShiftPayments(order_id=order_id,
                                  order_num=order_num,
                                  payment_id=payment_id,
@@ -352,7 +399,9 @@ def add_shift_payments(db: Session, payment):
     try:
         db.add(query)
         db.commit()
+        print("Добавлен чек")
     except IntegrityError as e:
+        print("ERROR : \n", e)
         db.rollback()
 
 

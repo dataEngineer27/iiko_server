@@ -265,3 +265,23 @@ def product_expense():
 
     crud.update_all_departments_is_added(db=session, departments=department_list)
     micro.logout(key=key)
+
+
+def reference_units(stop_event, arg):
+    session = SessionLocal()
+    key = micro.login()
+    root_type_list = ["Account", "AccountingCategory", "AlcoholClass", "AllergenGroup", "AttendanceType", "Conception",
+                      "CookingPlaceType", "DiscountType", "MeasureUnit", "OrderType", "PaymentType", "ProductCategory",
+                      "ProductScale", "ProductSize", "ScheduleType", "TaxCategory"]
+    if stop_event.is_set():  # Check if stop event is set
+        micro.logout(key=key)
+        return
+    for root_type in root_type_list:
+        try:
+            unit_list = micro.unit_list(root_type=root_type, key=key)
+        except:
+            key = micro.login()
+            unit_list = micro.unit_list(root_type=root_type, key=key)
+        crud.add_units(db=session, unit_list=unit_list)
+
+    micro.logout(key=key)

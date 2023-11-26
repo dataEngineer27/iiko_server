@@ -68,6 +68,11 @@ def nomenclature_groups(key):
 #     product_item_dtos = root.findall('productDto')
 #     return product_item_dtos
 
+def unit_list(root_type, key):
+    units = requests.get(f"{BASE_URL}/resto/api/v2/entities/list?rootType={root_type}&key={key}&includeDeleted=true")
+    return units.json()
+
+
 def nomenclature_list(key):
     nomenclatures = requests.get(f"{BASE_URL}/resto/api/v2/entities/products/list?key={key}&includeDeleted=true")
     return nomenclatures.json()
@@ -146,7 +151,7 @@ def shift_payments(key, session_id):
         "filters": {
             "SessionID": {
                 "filterType": "IncludeValues",
-                "values": ['629ca49d-52dd-4167-948f-6b16f96455dc']
+                "values": ["629ca49d-52dd-4167-948f-6b16f96455dc"]
             }
         }
     }
