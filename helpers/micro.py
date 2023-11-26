@@ -151,7 +151,7 @@ def shift_payments(key, session_id):
         "filters": {
             "SessionID": {
                 "filterType": "IncludeValues",
-                "values": ["629ca49d-52dd-4167-948f-6b16f96455dc"]
+                "values": [f"{session_id}"]
             }
         }
     }
