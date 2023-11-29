@@ -14,8 +14,8 @@ from jobs import *
 # apps.payments()  9
 # apps.product_expense()  10
 
-job_start_time = str(input("Enter start time of job:  "))
-jobs_end_time = str(input("Enter end time of all jobs:  "))
+# job_start_time = str(input("Enter start time of job:  "))
+# jobs_end_time = str(input("Enter end time of all jobs:  "))
 
 # List of jobs to start --- (You can give instead of day weekdays like wednesday)
 # schedule.every().day.at(job_start_time).do(departments_starter)  # 1
