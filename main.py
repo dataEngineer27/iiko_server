@@ -26,7 +26,7 @@ jobs_end_time = str(input("Enter end time of all jobs:  "))
 # schedule.every().day.at("18:16").do(employee_roles_starter)   # 6
 # schedule.every().day.at("18:16").do(employees_starter)   # 7
 # schedule.every().day.at("10:50").do(shift_list_starter)   # 8
-schedule.every().day.at(job_start_time).do(payments_starter)   # 9
+schedule.every().day.at("00:30").do(payments_starter)   # 9
 # schedule.every().day.at("06:30").do(product_expense_starter)   # 10
 # schedule.every().day.at(job_start_time).do(stores_starter)   # 11
 # schedule.every().day.at(job_start_time).do(store_remains_starter)   # 12
@@ -34,8 +34,8 @@ schedule.every().day.at(job_start_time).do(payments_starter)   # 9
 # schedule.every().day.at("06:30").do(product_expense_starter)   # 14
 
 # Stop all jobs
-# schedule.every().day.at('06:35').do(job_stopper)
-schedule.every().day.at(jobs_end_time).do(job_stopper)
+schedule.every().day.at('22:30').do(job_stopper)
+# schedule.every().day.at(jobs_end_time).do(job_stopper)
 
 while True:
     time.sleep(20)
