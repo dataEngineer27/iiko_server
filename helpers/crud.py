@@ -334,14 +334,12 @@ def add_shift_payments(db: Session, payment):
                              payment['OrderDiscount.Type.IDs'].split(", ")] if 'OrderDiscount.Type.IDs' in payment and \
                                                                                payment[
                                                                                    'OrderDiscount.Type.IDs'] else None
-    print('OrderDiscount.Type.IDs: ', orderdiscount_type_id)
     orderincrease_type = payment['OrderIncrease.Type'] if 'OrderIncrease.Type' in payment and payment[
         'OrderIncrease.Type'] else None
     orderincrease_type_id = [uuid.UUID(item) for item in
                              payment['OrderIncrease.Type.IDs'].split(", ")] if 'OrderIncrease.Type.IDs' in payment and \
                                                                                payment[
                                                                                    'OrderIncrease.Type.IDs'] else None
-    print('OrderIncrease.Type.IDs: ', orderincrease_type_id)
     itemsalediscount_name = payment['ItemSaleEventDiscountType'] if 'ItemSaleEventDiscountType' in payment and payment[
         'ItemSaleEventDiscountType'] else None
     fiscalcheque_num = payment['FiscalChequeNumber'] if 'FiscalChequeNumber' in payment and payment[
@@ -399,9 +397,8 @@ def add_shift_payments(db: Session, payment):
     try:
         db.add(query)
         db.commit()
-        print("Добавлен чек")
     except IntegrityError as e:
-        print("ERROR : \n", e)
+        print(f"ERROR of {shift_id}: \n{e}\n\n")
         db.rollback()
 
 
