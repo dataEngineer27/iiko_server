@@ -405,6 +405,37 @@ def add_shift_payments(db: Session, payment):
         db.rollback()
 
 
+def add_store_incoming(db: Session, item):
+    doc_number = item['Document'] if 'Document' in item and item['Document'] else None
+    incoming_date = item['DateTime.Typed'] if 'DateTime.Typed' in item and item['DateTime.Typed'] else None
+    transaction_date = item['DateSecondary.DateTimeTyped'] if 'DateSecondary.DateTimeTyped' in item and item['DateSecondary.DateTimeTyped'] else None
+    counteragent_id = item['Counteragent.Id'] if 'Counteragent.Id' in item and item['Counteragent.Id'] else None
+    counteragent_type = item['Account.CounteragentType'] if 'Account.CounteragentType' in item and item['Account.CounteragentType'] else None
+    store_name = item['Store'] if 'Store' in item and item['Store'] else None
+    sum = item['Sum.Incoming'] if 'Sum.Incoming' in item and item['Sum.Incoming'] else None
+    measureunit = item['Product.MeasureUnit'] if 'Product.MeasureUnit' in item and item['Product.MeasureUnit'] else None
+    nomenclature_id = item['Product.Id'] if 'Product.Id' in item and item['Product.Id'] else None
+    amount = item['Amount.In'] if 'Amount.In' in item and item['Amount.In'] else None
+
+    query = models.StoreIncomings(doc_number=doc_number,
+                                  incoming_date=incoming_date,
+                                  transaction_date=transaction_date,
+                                  counteragent_id=counteragent_id,
+                                  counteragent_type=counteragent_type,
+                                  store_name=store_name,
+                                  sum=sum,
+                                  measureunit=measureunit,
+                                  nomenclature_id=nomenclature_id,
+                                  amount=amount)
+    try:
+        db.add(query)
+        db.commit()
+        print("Добавлен вещь в склад")
+    except IntegrityError as e:
+        print("ERROR : \n", e)
+        db.rollback()
+
+
 def add_department_revenue(db: Session, department_revenue_list, department):
     for revenue in department_revenue_list:
         date = revenue.find('date')
@@ -476,6 +507,11 @@ def get_all_shifts(db: Session):
     return query
 
 
+def get_all_stores(db: Session):
+    query = db.query(models.Stores).all()
+    return query
+
+
 def get_payment_item(db: Session, shift_id, payment_id, nomenclature_id):
     payment_item = db.query(models.ShiftPayments).filter(and_(models.ShiftPayments.shift_id == shift_id,
                                                               models.ShiftPayments.payment_id == payment_id,
@@ -492,10 +528,23 @@ def get_store_remaining_item(db: Session, store_id, nomenclature_id, datetime):
     return remaining_item
 
 
+def get_store_incoming_item(db: Session, store_name, nomenclature_id, doc_number):
+    incoming_item = db.query(models.StoreIncomings).filter(and_(models.StoreIncomings.store_name == store_name,
+                                                                models.StoreIncomings.nomenclature_id == nomenclature_id,
+                                                                models.StoreIncomings.doc_number == doc_number)
+                                                           ).first()
+    return incoming_item
+
+
 def get_last_added_payment(db: Session):
     last_payment = db.query(models.ShiftPayments).order_by(models.ShiftPayments.last_update.desc()).first()
     # last_added_shift = last_payment.shift_id
     return last_payment
+
+
+def get_last_added_incoming(db: Session):
+    last_incoming = db.query(models.StoreIncomings).order_by(models.StoreIncomings.last_update.desc()).first()
+    return last_incoming
 
 
 def get_last_added_store_remaining(db: Session):

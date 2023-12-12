@@ -124,6 +124,16 @@ def store_remains_starter():
     threading_events.append((t, pill2kill))
 
 
+def store_incomings_starter():
+    global pill2kill
+    global t
+    pill2kill = threading.Event()
+    t = threading.Thread(target=apps.store_incomings, args=(pill2kill, 'task'))
+    t.start()
+    threading_events.append((t, pill2kill))
+
+
+
 def referenceunits_starter():
     global pill2kill
     global t

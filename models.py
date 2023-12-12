@@ -100,7 +100,7 @@ class Stores(Base):
     is_added = Column(Integer, default=0)
     department = relationship('Departments', back_populates='store')
     remains = relationship('StoreRemains', back_populates='store')
-    incomings = relationship('StoreIncomings', back_populates='store')
+    # incomings = relationship('StoreIncomings', back_populates='store')
     sendings = relationship('StoreSendings', back_populates='store')
 
 
@@ -120,23 +120,28 @@ class StoreRemains(Base):
 class StoreIncomings(Base):
     __tablename__ = 'store_incomings'
     id = Column(BIGINT, primary_key=True, index=True, autoincrement=True)
-    incoming_invoice_id = Column(UUID(as_uuid=True), nullable=True)
+    # incoming_invoice_id = Column(UUID(as_uuid=True), nullable=True)
     doc_number = Column(String, nullable=True)
     incoming_date = Column(DateTime(timezone=True))
-    due_date = Column(DateTime(timezone=True))
-    supplier_id = Column(UUID(as_uuid=True), nullable=True)
-    store_id = Column(UUID(as_uuid=True), ForeignKey('stores.id'), nullable=True)
-    actual_amount = Column(DECIMAL, nullable=True)
-    price = Column(DECIMAL, nullable=True)
-    price_withoutVat = Column(DECIMAL, nullable=True)
+    transaction_date = Column(DateTime(timezone=True))
+    counteragent_id = Column(UUID(as_uuid=True), nullable=True)
+    counteragent_type = Column(String, nullable=True)
+    store_name = Column(String, nullable=True)  # ForeignKey('stores.name')
+    # actual_amount = Column(DECIMAL, nullable=True)
+    # price = Column(DECIMAL, nullable=True)
+    # price_withoutVat = Column(DECIMAL, nullable=True)
     sum = Column(DECIMAL, nullable=True)
-    measureunit_id = Column(UUID(as_uuid=True), ForeignKey('reference_units.id'), nullable=True)
+    measureunit = Column(String, nullable=True)  # ForeignKey('reference_units.name')
     nomenclature_id = Column(UUID(as_uuid=True), ForeignKey('nomenclatures.id'), nullable=True)
     amount = Column(DECIMAL, nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
-    store = relationship('Stores', back_populates='incomings')
+    # store = relationship('Stores', back_populates='incomings')
+    # store_fk = relationship('Stores', backref='store_name', uselist=False,
+    #                         foreign_keys="StoreIncomings.store_name")
     nomenclatures = relationship('Nomenclatures', back_populates='incomings')
-    units = relationship('ReferenceUnits', back_populates='incomings')
+    # units = relationship('ReferenceUnits', back_populates='incomings')
+    # units_fk = relationship('ReferenceUnits', backref='measureunit_name', uselist=False,
+    #                         foreign_keys="StoreIncomings.measureunit")
     # sendings = relationship('StoreSendings', back_populates='incomings')
 
 
@@ -167,7 +172,7 @@ class ReferenceUnits(Base):
     deleted = Column(Boolean, nullable=True)
     code = Column(String, nullable=True)
     name = Column(String, nullable=True)
-    incomings = relationship('StoreIncomings', back_populates='units')
+    # incomings = relationship('StoreIncomings', back_populates='units')
     # nomenclatures_mainunit = relationship('Nomenclatures', back_populates='main_unit_fk')
     # nomenclatures_placetype = relationship('Nomenclatures', back_populates='place_type_fk')
     # payments_ordertype = relationship('ShiftPayments', back_populates='ordertype_fk')

@@ -69,7 +69,7 @@ def nomenclature_groups(key):
 #     return product_item_dtos
 
 def unit_list(root_type, key):
-    units = requests.get(f"{BASE_URL}/resto/api/v2/entities/list?rootType={root_type}&key={key}&includeDeleted=true")
+    units = requests.get(f"{BASE_URL}/resto/api/v2/entities/list?rootType={root_type}&key={key}&includeDeleted=false")
     return units.json()
 
 
@@ -157,6 +157,44 @@ def shift_payments(key, session_id):
     }
     payment_list = requests.post(url=url, json=data_json)
     return payment_list.json()
+
+
+def store_incomings(key, date):
+    url = f"{BASE_URL}/resto/api/v2/reports/olap?key={key}"
+    data_json = {
+        "reportType": "TRANSACTIONS",
+        "buildSummary": "false",
+        "groupByColFields": [
+            "Store",
+            "DateSecondary.DateTimeTyped",
+            "DateTime.Typed",
+            "Document",
+            "Product.Id",
+            "Product.MeasureUnit",
+            "Counteragent.Id",
+            "Account.CounteragentType"
+        ],
+        "aggregateFields": [
+            "Amount.In",
+            "Sum.Incoming"
+        ],
+        "filters": {
+            "DateTime.DateTyped": {
+                "filterType": "DateRange",
+                "periodType": "CUSTOM",
+                "from": f"{date}",
+                "to": f"{date}",
+                "includeLow": True,
+                "includeHigh": True
+            },
+            "TransactionType": {
+                "filterType": "IncludeValues",
+                "values": ["INVOICE"]
+            }
+        }
+    }
+    incoming_list = requests.post(url=url, json=data_json)
+    return incoming_list.json()
 
 
 def department_revenue(key, department):

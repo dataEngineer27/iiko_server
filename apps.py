@@ -78,6 +78,51 @@ def store_remains(stop_event, arg):
     micro.logout(key=key)
 
 
+def store_incomings(stop_event, arg):
+    session = SessionLocal()
+    key = micro.login()
+    today = datetime.datetime.now().date()
+    incoming_list = micro.store_incomings(key=key, date=today)
+    incoming_list = incoming_list['data']
+    print(incoming_list)
+    # store_list = crud.get_all_stores(db=session)
+    last_incoming = crud.get_last_added_incoming(db=session)
+    i = 0
+    if last_incoming is not None:
+        if today > last_incoming.last_update.date():
+            for item in incoming_list:
+                i += 1
+                if stop_event.is_set():  # Check if stop event is set
+                    break
+                crud.add_store_incoming(db=session, item=item)
+        else:
+            for item in incoming_list:
+                print("ITEM: ", item)
+                store_name = item['Store'] if 'Store' in item and item['Store'] is not None else None
+                print(store_name, item['Store'])
+                nomenclature_id = item['Product.Id'] if 'Product.Id' in item and item['Product.Id'] is not None else None
+                doc_number = item['Document'] if 'Document' in item and item['Document'] is not None else None
+                i += 1
+                available_store_item = crud.get_store_incoming_item(db=session,
+                                                                    store_name=store_name,
+                                                                    nomenclature_id=nomenclature_id,
+                                                                    doc_number=doc_number
+                                                                    )
+                if available_store_item:
+                    print(f"Was skipped existing {i}-item")
+                    continue
+                else:
+                    crud.add_store_incoming(db=session, item=item)
+                    print(f"Was inserted {i}-item")
+    else:
+        for item in incoming_list:
+            i += 1
+            crud.add_store_incoming(db=session, item=item)
+            print(f"Was inserted {i}-item")
+
+    micro.logout(key=key)
+
+
 def nomenclature_categories(stop_event, arg):
     session = SessionLocal()
     key = micro.login()
