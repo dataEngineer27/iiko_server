@@ -198,10 +198,14 @@ def store_incomings(key, date):
 
 
 def department_revenue(key, department):
-    department_data = requests.get(f"{BASE_URL}/resto/api/reports/sales?key={key}&department={department}&dateFrom=01.01.2022&dateTo=31.12.2022&dishDetails=true&allRevenue=true")
-    root = ET.fromstring(department_data.content)
-    corporate_item_dtos = root.findall('dayDishValue')
-    return corporate_item_dtos
+    url = f"{BASE_URL}/resto/api/reports/sales?key={key}&department={department}&dateFrom=01.10.2023&dateTo=13.12.2023&dishDetails=true&allRevenue=true"
+    # root = ET.fromstring(department_data.content)
+    # corporate_item_dtos = root.findall('dayDishValue')
+    # return corporate_item_dtos
+    res = requests.get(url=url)
+    data_xml = res.text
+    data_dict = xmltodict.parse(data_xml)
+    return data_dict
 
 
 def product_expenses(key, department):

@@ -61,7 +61,8 @@ def store_remains(stop_event, arg):
                 i += 1
                 available_store_item = crud.get_store_remaining_item(db=session,
                                                                      store_id=item['store'] if item['store'] else None,
-                                                                     nomenclature_id=item['product'] if item['product'] else None,
+                                                                     nomenclature_id=item['product'] if item[
+                                                                         'product'] else None,
                                                                      datetime=current_datetime)
                 if available_store_item:
                     print(f"Was skipped existing {i}-item")
@@ -100,7 +101,8 @@ def store_incomings(stop_event, arg):
                 print("ITEM: ", item)
                 store_name = item['Store'] if 'Store' in item and item['Store'] is not None else None
                 print(store_name, item['Store'])
-                nomenclature_id = item['Product.Id'] if 'Product.Id' in item and item['Product.Id'] is not None else None
+                nomenclature_id = item['Product.Id'] if 'Product.Id' in item and item[
+                    'Product.Id'] is not None else None
                 doc_number = item['Document'] if 'Document' in item and item['Document'] is not None else None
                 i += 1
                 available_store_item = crud.get_store_incoming_item(db=session,
@@ -173,23 +175,39 @@ def nomenclatures(stop_event, arg):
 
 def department_revenue(stop_event, arg):
     session = SessionLocal()
-    key = micro.login()
     department_list = crud.get_all_departments(db=session)
+    d = 0
     for department in department_list:
+        key = micro.login()
+        d += 1
+        department_id = department.id
         if stop_event.is_set():  # Check if stop event is set
             break
         if department.is_added == 0:
             try:
-                revenue_list = micro.department_revenue(key=key, department=department.id)
+                revenue_list = micro.department_revenue(key=key, department=department_id)['dayDishValues'][
+                    'dayDishValue']
             except:
-                key = micro.login()
-                try:
-                    revenue_list = micro.department_revenue(key=key, department=department.id)
-                except SyntaxError as e:
-                    crud.update_department(db=session, id=department.id)
-                    continue
-            crud.add_department_revenue(db=session, department_revenue_list=revenue_list, department=department.id)
-            crud.update_department(db=session, id=department.id)
+                crud.update_department(db=session, id=department_id)
+                continue
+            for item in revenue_list:
+                date = item['date'] if "date" in item and item['date'] else None
+                nomenclature_id = item['productId'] if "productId" in item and item['productId'] else None
+                crud.add_department_revenue(db=session, item=item, department_id=department_id)
+                print(f"Was inserted department №{d} - {department_id}: product-{nomenclature_id} in {date}")
+            crud.update_department(db=session, id=department_id)
+            # for item in revenue_list:
+            #     date = item['date'] if "date" in item and item['date'] else None
+            #     nomenclature_id = item['productId'] if "productId" in item and item['productId'] else None
+            #     available_item = crud.get_revenue_item(db=session, date=date, department_id=department_id,
+            #                                            nomenclature_id=nomenclature_id)
+            #     if available_item:
+            #         print(f"Exist item of department №{d} ({department_id}) in {date}: product - {nomenclature_id}")
+            #         continue
+            #     else:
+            #         crud.add_department_revenue(db=session, item=item, department_id=department_id)
+            #         crud.update_department(db=session, id=department_id)
+            #         print(f"Was inserted department №{d} - {department_id}: in {date}")
 
     micro.logout(key=key)
 

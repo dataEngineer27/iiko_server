@@ -22,7 +22,7 @@ jobs_end_time = str(input("Enter end time of all jobs:  "))
 # schedule.every().day.at(job_start_time).do(nomenclature_categories_starter)  # 2
 # schedule.every().day.at(job_start_time).do(nomenclature_groups_starter)  # 3
 # schedule.every().day.at(job_start_time).do(nomenclatures_starter)  # 4
-# schedule.every().day.at("10:14").do(department_revenue_starter)   # 5
+schedule.every().day.at(job_start_time).do(department_revenue_starter)   # 5
 # schedule.every().day.at("18:16").do(employee_roles_starter)   # 6
 # schedule.every().day.at("18:16").do(employees_starter)   # 7
 # schedule.every().day.at("10:50").do(shift_list_starter)   # 8
@@ -30,7 +30,7 @@ jobs_end_time = str(input("Enter end time of all jobs:  "))
 # schedule.every().day.at("06:30").do(product_expense_starter)   # 10
 # schedule.every().day.at(job_start_time).do(stores_starter)   # 11
 # schedule.every().day.at(job_start_time).do(store_remains_starter)   # 12
-schedule.every().day.at(job_start_time).do(store_incomings_starter)   # 13
+# schedule.every().day.at(job_start_time).do(store_incomings_starter)   # 13
 # schedule.every().day.at(job_start_time).do(store_remains_starter)   # 14
 # schedule.every().day.at(job_start_time).do(referenceunits_starter)   # 15
 # schedule.every().day.at("06:30").do(product_expense_starter)   # 16

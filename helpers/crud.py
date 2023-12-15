@@ -93,6 +93,7 @@ def add_categories(db: Session, category_list):
             db.commit()
             print(f"Was added category: ", category['name'])
         except IntegrityError as e:
+            print(f"Error of category: ", e)
             db.rollback()
 
 
@@ -433,23 +434,16 @@ def add_store_incoming(db: Session, item):
         db.rollback()
 
 
-def add_department_revenue(db: Session, department_revenue_list, department):
-    for revenue in department_revenue_list:
-        date = revenue.find('date')
-        date = date.text if date is not None else None
-        product_id = revenue.find('productId')
-        product_id = product_id.text if product_id is not None else None
-        sum = revenue.find('value')
-        sum = sum.text if sum is not None else None
-        query = models.DepartmentRevenue(department_id=department,
-                                         nomenclature_id=product_id,
-                                         date=date,
-                                         sum=sum)
-        try:
-            db.add(query)
-            db.commit()
-        except IntegrityError as e:
-            db.rollback()
+def add_department_revenue(db: Session, item, department_id):
+    date = item['date'] if "date" in item and item['date'] else None
+    nomenclature_id = item['productId'] if "productId" in item and item['productId'] else None
+    sum = item['value'] if "value" in item and item['value'] else None
+    query = models.DepartmentRevenue(department_id=department_id,
+                                     nomenclature_id=nomenclature_id,
+                                     date=date,
+                                     sum=sum)
+    db.add(query)
+    db.commit()
 
 
 def add_product_expense(db: Session, product_expense_list, department, not_found_products):
@@ -531,6 +525,15 @@ def get_store_incoming_item(db: Session, store_name, nomenclature_id, doc_number
                                                                 models.StoreIncomings.doc_number == doc_number)
                                                            ).first()
     return incoming_item
+
+
+def get_revenue_item(db: Session, date, department_id, nomenclature_id):
+    revenue_item = db.query(models.DepartmentRevenue).filter(and_(models.DepartmentRevenue.date == date,
+                                                                  models.DepartmentRevenue.department_id == department_id,
+                                                                  models.DepartmentRevenue.nomenclature_id == nomenclature_id)
+                                                             ).first()
+    return revenue_item
+
 
 
 def get_last_added_payment(db: Session):
