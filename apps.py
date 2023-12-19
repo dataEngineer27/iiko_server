@@ -209,7 +209,7 @@ def department_revenue(stop_event, arg):
             #         crud.update_department(db=session, id=department_id)
             #         print(f"Was inserted department №{d} - {department_id}: in {date}")
 
-    micro.logout(key=key)
+        micro.logout(key=key)
 
 
 def employee_roles(stop_event, arg):

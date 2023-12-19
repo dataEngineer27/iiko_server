@@ -198,7 +198,7 @@ def store_incomings(key, date):
 
 
 def department_revenue(key, department):
-    url = f"{BASE_URL}/resto/api/reports/sales?key={key}&department={department}&dateFrom=01.10.2023&dateTo=13.12.2023&dishDetails=true&allRevenue=true"
+    url = f"{BASE_URL}/resto/api/reports/sales?key={key}&department={department}&dateFrom=01.10.2023&dateTo=15.12.2023&dishDetails=true&allRevenue=true"
     # root = ET.fromstring(department_data.content)
     # corporate_item_dtos = root.findall('dayDishValue')
     # return corporate_item_dtos
@@ -209,7 +209,7 @@ def department_revenue(key, department):
 
 
 def product_expenses(key, department):
-    response = requests.get(f"{BASE_URL}/resto/api/reports/productExpense?key={key}&department={department}&dateFrom=01.01.2023&dateTo=01.02.2023")
+    response = requests.get(f"{BASE_URL}/resto/api/reports/productExpense?key={key}&department={department}&dateFrom=01.01.2023&dateTo=30.11.2023")
     root = ET.fromstring(response.content)
     expense_data = root.findall("dayDishValue")
     return expense_data
