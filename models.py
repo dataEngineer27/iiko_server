@@ -319,7 +319,7 @@ class ProductExpense(Base):
     date = Column(DateTime(timezone=True))
     name = Column(String)
     quantity = Column(Float, nullable=True)
-    main_unit = Column(String, ForeignKey('reference_units.id'), nullable=True)
+    main_unit = Column(UUID, ForeignKey('reference_units.id'), nullable=True)
     last_update = Column(DateTime(timezone=True), default=func.now())
     category = relationship('Categories', back_populates='product_expense')
     groups = relationship('Groups', back_populates='product_expense')
