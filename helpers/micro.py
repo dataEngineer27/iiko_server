@@ -209,7 +209,10 @@ def department_revenue(key, department):
 
 
 def product_expenses(key, department):
-    response = requests.get(f"{BASE_URL}/resto/api/reports/productExpense?key={key}&department={department}&dateFrom=01.01.2023&dateTo=30.11.2023")
-    root = ET.fromstring(response.content)
-    expense_data = root.findall("dayDishValue")
-    return expense_data
+    url = f"{BASE_URL}/resto/api/reports/productExpense?key={key}&department={department}&dateFrom=01.01.2023&dateTo=30.11.2023"
+    # root = ET.fromstring(response.content)
+    # expense_data = root.findall("dayDishValue")
+    res = requests.get(url=url)
+    data_xml = res.text
+    data_dict = xmltodict.parse(data_xml)
+    return data_dict

@@ -446,26 +446,22 @@ def add_department_revenue(db: Session, item, department_id):
     db.commit()
 
 
-def add_product_expense(db: Session, product_expense_list, department, not_found_products):
+def add_product_expense(db: Session, product_expense_list, department):  # not_found_products
     for i in product_expense_list:
-        product_id = i.find('productId')
-        product_id = product_id.text if product_id is not None else None
-        try:
-            product_details = get_product(db=session, id=product_id)
-            group_id = product_details.group_id
-            category_id = product_details.category_id
-            main_unit = product_details.main_unit
-        except:
-            not_found_products[f"{department}"] = product_id
-            group_id = None
-            category_id = None
-            main_unit = None
-        date = i.find('date')
-        date = date.text if date is not None else None
-        name = i.find('productName')
-        name = name.text if name is not None else None
-        quantity = i.find('value')
-        quantity = quantity.text if quantity is not None else None
+        product_id = i['productId'] if "productId" in i and i['productId'] else None
+        # try:
+        product_details = get_product(db=session, id=product_id)
+        group_id = product_details.group_id
+        category_id = product_details.category_id
+        main_unit = product_details.main_unit
+        # except:
+        #     not_found_products[f"{department}"] = product_id
+        #     group_id = None
+        #     category_id = None
+        #     main_unit = None
+        date = i['date'] if "date" in i and i['date'] else None
+        name = i['productName'] if "productName" in i and i['productName'] else None
+        quantity = i['value'] if "value" in i and i['value'] else None
         query = models.ProductExpense(nomenclature_id=product_id,
                                       category_id=category_id,
                                       group_id=group_id,
@@ -477,10 +473,12 @@ def add_product_expense(db: Session, product_expense_list, department, not_found
         try:
             db.add(query)
             db.commit()
+            print("Added expense: ", product_id, date)
         except IntegrityError as e:
             db.rollback()
+            print("ERROR: \n", e)
 
-    return not_found_products
+    # return not_found_products
 
 
 def get_product(db: Session, id):

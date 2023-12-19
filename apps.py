@@ -304,29 +304,33 @@ def payments(stop_event, arg):
     micro.logout(key=key)
 
 
-def product_expense():
+def product_expense(stop_event, arg):
     session = SessionLocal()
     not_found_products = {}
-    key = micro.login()
     department_list = crud.get_all_departments(db=session)
     for department in department_list:
-        if department.is_added == 0:
-            try:
-                product_expense_list = micro.product_expenses(key=key, department=department.id)
-            except:
-                key = micro.login()
-                product_expense_list = micro.product_expenses(key=key, department=department.id)
-
-            not_found_products = crud.add_product_expense(db=session,
-                                                          product_expense_list=product_expense_list,
-                                                          department=department.id,
-                                                          not_found_products=not_found_products)
+        if stop_event.is_set():  # Check if stop event is set
+            break
+        key = micro.login()
+        # if department.is_added == 0:
+        try:
+            product_expense_list = micro.product_expenses(key=key, department=department.id)['dayDishValues']['dayDishValue']
+        except:
             crud.update_department(db=session, id=department.id)
-            with open("not_found_products(product_expense).json", "w+") as json_file:
-                json.dump(not_found_products, json_file)
-
+            continue
+        crud.add_product_expense(db=session,
+                                 product_expense_list=product_expense_list,
+                                 department=department.id
+                                 )  # not_found_products=not_found_products
+        crud.update_department(db=session, id=department.id)
+            # not_found_products = crud.add_product_expense(db=session,
+            #                                               product_expense_list=product_expense_list,
+            #                                               department=department.id,
+            #                                               not_found_products=not_found_products)
+            # with open("not_found_products(product_expense).json", "w+") as json_file:
+            #     json.dump(not_found_products, json_file)
+        micro.logout(key=key)
     crud.update_all_departments_is_added(db=session, departments=department_list)
-    micro.logout(key=key)
 
 
 def reference_units(stop_event, arg):
