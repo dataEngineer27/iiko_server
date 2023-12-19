@@ -185,12 +185,11 @@ def department_revenue(stop_event, arg):
             break
         if department.is_added == 0:
             try:
-                revenue_list = micro.department_revenue(key=key, department=department_id)['dayDishValues'][
-                    'dayDishValue']
+                revenue_list = micro.department_revenue(key=key, department=department_id)
             except:
                 crud.update_department(db=session, id=department_id)
                 continue
-            for item in revenue_list:
+            for item in revenue_list['dayDishValues']['dayDishValue']:
                 date = item['date'] if "date" in item and item['date'] else None
                 nomenclature_id = item['productId'] if "productId" in item and item['productId'] else None
                 crud.add_department_revenue(db=session, item=item, department_id=department_id)
