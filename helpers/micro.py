@@ -213,6 +213,9 @@ def product_expenses(key, department):
     # root = ET.fromstring(response.content)
     # expense_data = root.findall("dayDishValue")
     res = requests.get(url=url)
-    data_xml = res.text
-    data_dict = xmltodict.parse(data_xml)
+    try:
+        data_xml = res.text
+        data_dict = xmltodict.parse(data_xml)
+    except:
+        return None
     return data_dict
