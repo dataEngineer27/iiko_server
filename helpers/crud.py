@@ -473,10 +473,10 @@ def add_product_expense(db: Session, product_expense_list, department):  # not_f
         try:
             db.add(query)
             db.commit()
-            print("Added expense: ", product_id, date)
+            # print("Added expense: ", product_id, date)
         except IntegrityError as e:
             db.rollback()
-            print("ERROR: \n", e)
+            # print("ERROR: \n", e)
 
     # return not_found_products
 
